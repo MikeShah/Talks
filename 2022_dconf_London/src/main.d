@@ -8,27 +8,33 @@ import vec3;
 import std.stdio;
 import std.conv;
 import std.math.traits;;
+import std.math;
 
-bool HitSphere(Vec3 center, double radius, Ray r){
+double HitSphere(Vec3 center, double radius, Ray r){
     Vec3 oc = r.GetOrigin() - center;
     
     double a = DotProduct(r.GetDirection(), r.GetDirection());
     double b = 2.0 * DotProduct(oc, r.GetDirection());
     double c = DotProduct(oc,oc) - radius*radius;
-    double discriminat = b*b - 4*a*c;
-
-    return (discriminat > 0);
+    double discriminant = b*b - 4*a*c;
+    if(discriminant < 0){
+        return -1.0;
+    }else{
+        return (-b - sqrt(discriminant)) / (2.0 *a);
+    }
 }
 
 
 // Cast a ray out into the screen
 Vec3 CastRay(Ray r){
-    if(HitSphere(new Vec3(0,0,-1),0.5,r)){
-        return (new Vec3(0.0,0.0,1.0));
+    auto t = HitSphere(new Vec3(0,0,-1),0.5,r);
+    if(t > 0.0){
+        Vec3 normal = (r.At(t) - new Vec3(0.0,0.0,-1)).ToUnitVector();
+        return 0.5* new Vec3(normal.X()+1.0,normal.Y()+1.0,normal.Z()+1);
     }
 
     Vec3 unitDirection = r.GetDirection().ToUnitVector();
-    auto t = 0.5* (unitDirection.Y() + 1.0);
+    t = 0.5* (unitDirection.Y() + 1.0);
             // Blend value from start value  to the end value
     return ((1.0-t)*(new Vec3(0.5,0.7,1.0))) + t*(new Vec3(1.0,1.0,1.0));
 }
