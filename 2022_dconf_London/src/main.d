@@ -9,15 +9,28 @@ import std.stdio;
 import std.conv;
 import std.math.traits;;
 
+bool HitSphere(Vec3 center, double radius, Ray r){
+    Vec3 oc = r.GetOrigin() - center;
+    
+    double a = DotProduct(r.GetDirection(), r.GetDirection());
+    double b = 2.0 * DotProduct(oc, r.GetDirection());
+    double c = DotProduct(oc,oc) - radius*radius;
+    double discriminat = b*b - 4*a*c;
+
+    return (discriminat > 0);
+}
+
+
 // Cast a ray out into the screen
 Vec3 CastRay(Ray r){
+    if(HitSphere(new Vec3(0,0,-1),0.5,r)){
+        return (new Vec3(0.0,0.0,1.0));
+    }
+
     Vec3 unitDirection = r.GetDirection().ToUnitVector();
     auto t = 0.5* (unitDirection.Y() + 1.0);
-    if(isNaN(unitDirection.Y())){
-        writeln("Found the thing");
-    }
             // Blend value from start value  to the end value
-    return ((1.0-t)*(new Vec3(1.0,1.0,1.0))) + t*(new Vec3(0.5,0.7,1.0));
+    return ((1.0-t)*(new Vec3(0.5,0.7,1.0))) + t*(new Vec3(1.0,1.0,1.0));
 }
 
 

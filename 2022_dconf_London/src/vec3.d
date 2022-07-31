@@ -47,7 +47,6 @@ class Vec3{
     /// Normalize a vector into a unit vector
     void Normalize() {
         if( !IsZero()){
-
             double length = Length();
             e[0] /= length;
             e[1] /= length;
@@ -64,9 +63,31 @@ class Vec3{
 
     /// Test if this is a zero vector
     bool IsZero() const{
-        return (e[0] <= 0.00001 && 
-                e[1] <= 0.00001 && 
-                e[2] <= 0.00001);
+        return (abs(e[0]) <= 0.000001 &&
+                abs(e[1]) <= 0.000001 && 
+                abs(e[2]) <= 0.000001);
+    }
+
+    /// Retrieve a unit vector
+    Vec3 ToUnitVector(){
+        // Compute the length once
+        auto len = Length();
+        // TODO: Throw exceptoin if lenth is 0
+        if(len!=0){
+            e[0] = e[0] / len;
+            e[1] = e[1] / len;
+            e[2] = e[2] / len;
+        }
+        return this;
+    }
+
+    /// Return true or false if this is a unit vector
+    bool IsUnitVector() const{
+        if( abs(sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]) -1.0) < 0.000001){
+            return true;
+        }
+        return false;        
+
     }
 
     /// Prints out the vector to stdout
@@ -94,9 +115,9 @@ class Vec3{
 
     /// Test for opreator equality
      bool opEquals(const Vec3 rhs) {
-        if (abs (e[0]- rhs.e[0]) < 0.00001 &&
-            abs (e[1]- rhs.e[1]) < 0.00001 &&
-            abs (e[2]- rhs.e[2]) < 0.00001)
+        if (abs (e[0]- rhs.e[0]) < 0.000001 &&
+            abs (e[1]- rhs.e[1]) < 0.000001 &&
+            abs (e[2]- rhs.e[2]) < 0.000001)
         {
             return true;
         }else{
@@ -189,26 +210,6 @@ class Vec3{
         return result;
     }
 
-    /// Retrieve a unit vector
-    Vec3 ToUnitVector(){
-        // Compute the length once
-        auto len = Length();
-        if(len!=0){
-            e[0] /= len;
-            e[1] /= len;
-            e[2] /= len;
-        }
-        return this;
-    }
-
-    /// Return true or false if this is a unit vector
-    bool IsUnitVector() const{
-        if( abs(sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]) -1.0f) < 0.00001){
-            return true;
-        }
-        return false;        
-
-    }
 
     // Store x,y,z components.
     private double[3] e;
@@ -272,7 +273,7 @@ unittest{
     Vec3 v = new Vec3(4,5,6);
     v.Normalize();
 
-    assert( (1.0 - v.Length()) <= 0.00001);
+    assert( (1.0 - v.Length()) <= 0.000001);
 }
 
 /// Test if a vector is a zero vector
@@ -292,7 +293,7 @@ unittest{
     v1.Normalize();
     v2.Normalize();
 
-    assert( DotProduct(v1,v2) <= 0.00001);
+    assert( DotProduct(v1,v2) <= 0.000001);
 }
 /// Compute the dot products of two normalized vectors 
 unittest{
@@ -330,6 +331,7 @@ unittest{
     assert(result.Z() == 11);
 }
 
+/// Unit vector tests
 unittest{
     Vec3 v1 = new Vec3(2,3,4);
     Vec3 v2 = new Vec3(1,0,0);
@@ -337,6 +339,18 @@ unittest{
     assert(v1.IsUnitVector() == false);
     assert(v2.IsUnitVector() == true);
     assert(v1.ToUnitVector().IsUnitVector() == true);
+
+    Vec3 v3 = new Vec3(0.5,0.25,0.115);
+    assert(v3.ToUnitVector().IsUnitVector() == true);
+
+    Vec3 v4 = new Vec3(0.0,0.0,0.0);
+    assert(v4.ToUnitVector().IsUnitVector() == false);
+
+    Vec3 v5 = new Vec3(1.96,2.98,3.1);
+    assert(v5.ToUnitVector().IsUnitVector() == true);
+
+    Vec3 v6 = new Vec3(-0.98,0.97,0.0);
+    assert(v6.ToUnitVector().IsUnitVector() == true);
 }
 
 /// Scalar multiply by vector
