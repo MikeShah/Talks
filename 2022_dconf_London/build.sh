@@ -1,1 +1,1 @@
-dmd -g ./src/*.d -of=prog && ./prog && open ./output/image.ppm
+dmd -g ./src/*.d -of=prog && ./prog && display ./output/image.ppm

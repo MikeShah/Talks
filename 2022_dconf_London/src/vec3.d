@@ -44,6 +44,16 @@ class Vec3{
     /// Alias of 'Length' function for Magnitude
     alias Magnitude = Length;
 
+    /// Returns the length of a vector squared,
+	/// thus avoiding a sqrt operation
+    double LengthSquared() const{
+        if(IsZero()){
+            return 0;
+        }
+
+        return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];        
+    }
+
     /// Normalize a vector into a unit vector
     void Normalize() {
         if( !IsZero()){

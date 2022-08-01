@@ -16,7 +16,8 @@ class PPM{
     }
 
     /// Write the file
-    void WriteFile(string filename, MagicNumber magicNumber){
+	/// If 'flip' is toggled to true, then flips the PPM image
+    void WriteFile(string filename, MagicNumber magicNumber, const bool flip){
         File file = File(filename, "w");
 
         // Write out the header P3 header
@@ -25,8 +26,8 @@ class PPM{
         file.writeln(to!string(m_maxValue));
 
         if(magicNumber == MagicNumber.P3){
-            // Write out the pixel data
-            for(uint y=0; y < m_height; ++y){
+            // Write out the pixel data	
+            for(uint y=m_height-1; y >0 ; --y){
                 // Progress bar
                 //writeln("Writing PPM line: "~to!string(y)~"/"~to!string(m_height));
                 for(uint x=0; x < m_width; ++x){
