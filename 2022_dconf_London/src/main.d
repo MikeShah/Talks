@@ -5,11 +5,14 @@ import ppm;
 import ray;
 import vec3;
 import sphere;
+import utility;
+import camera;
 
 import std.stdio;
 import std.conv;
-import std.math.traits;;
+import std.math.traits;
 import std.math;
+import std.algorithm;
 
 
 
@@ -31,47 +34,38 @@ Vec3 CastRay(Ray r, Hittable world){
 
 
 void main(){
-    // Screen Aspect Ratio
-    double aspectRatio 		= 16.0/9.0;
-    const uint screenWidth 	= 400;
-    const uint screenHeight = to!uint(screenWidth/aspectRatio);
-    
+
+
+	// Create the camera for our scene
+	Camera cam = new Camera;
+    // Create a PPM image to write to
+    PPM ppm = new PPM(cam.GetScreenWidth(),cam.GetScreenHeight());    
 	// World
 	HittableList world = new HittableList;
 	world.Add(new Sphere(new Vec3(0,0,-1) 	  ,0.5));
 	world.Add(new Sphere(new Vec3(0,-100.5,-1),100));
 
-
-    // Camera
-    auto viewportHeight = 2.0;
-    auto viewportWidth 	= aspectRatio * viewportHeight;
-    auto focalLength 	= 1.0;
-
-    auto origin 		 = new Vec3(0.0,0.0,0.0);
-    auto horizontal 	 = new Vec3(viewportWidth,0.0,0.0);
-    auto vertical   	 = new Vec3(0.0,viewportHeight,0.0);
-    auto lowerLeftCorner = origin - (horizontal/2.0) - (vertical/2.0) - (new Vec3(0.0,0.0,focalLength));
-    writeln(lowerLeftCorner);
-
-    // Create a PPM image to write to
-    PPM ppm = new PPM(screenWidth,screenHeight);    
-
 	// Iterate through every pixel one (or multiple times)
 	// to generate an image. This is the color of the ray tracer,
 	// that shoots out at least one ray per pixel, testing for intersections
 	// with an object.
-    for(int y=screenHeight-1; y >=0; --y){
-        for(int x= 0; x < screenWidth; ++x){
-            double u = double(x) / double(screenWidth-1);
-            double v = double(y) / double(screenHeight-1);
+    for(int y=cam.GetScreenHeight()-1; y >=0; --y){
+        for(int x= 0; x < cam.GetScreenWidth(); ++x){
             // Cast ray into scene
-            Ray r = new Ray(origin,lowerLeftCorner + u*horizontal + v*vertical - origin);
-            // Determine the pixel color
-            Vec3 pixelColor = CastRay(r,world);
+			// Accumulate the pixel color from multiple samples
+			Vec3 pixelColor = new Vec3(0.0,0.0,0.0);
+			for(int s= 0; s < cam.GetSamplesPerPixel(); ++s){
+				double u = (double(x)+GenerateRandomDouble()) / double(cam.GetScreenWidth()-1);
+				double v = (double(y)+GenerateRandomDouble()) / double(cam.GetScreenHeight()-1);
+            	Ray r = cam.GetCameraRay(u,v);
+            	pixelColor = pixelColor + CastRay(r,world);
+			}
+			auto scale = 1.0/ cam.GetSamplesPerPixel();
+			double r = clamp( (255*pixelColor[0]) * scale, 0,255);
+			double g = clamp( (255*pixelColor[1]) * scale, 0,255);
+			double b = clamp( (255*pixelColor[2]) * scale, 0,255);
 			// Write out one pixel of information
-			ppm.SetPixel(x,y,to!ubyte(255*pixelColor[0]),
-						 	 to!ubyte(255*pixelColor[1]),
-						 	 to!ubyte(255*pixelColor[2]));
+			ppm.SetPixel(x,y,to!ubyte(r), to!ubyte(g), to!ubyte(b));
         }
     }
 
