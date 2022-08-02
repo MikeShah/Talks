@@ -17,12 +17,25 @@ import std.algorithm;
 
 
 
-// Cast a ray out into the screen
-Vec3 CastRay(Ray r, Hittable world){
+/// Cast a ray out into the screen
+/// 'ray' is where the ray is cast
+/// world can be a single object or collection to test intersection.
+/// depth is the maximum number of 'bounces' for the ray
+Vec3 CastRay(Ray r, Hittable world, int depth){
 	HitRecord rec = new HitRecord;
-	if(world.Hit(r,0,10000,rec)){
+	// Check our base case
+	if(depth <=0){
+		return new Vec3(0,0,0);
+	}
+
+
+	// Note, tMin to 0.0001 to fix shadow 'acne' issue of rays
+    //	hitting off of -.00001 instead of t=0
+	if(world.Hit(r,0.0001,10000,rec)){
 		Vec3 test = new Vec3(1.0,1.0,1.0);
-		return 0.5 * (rec.normal + test);
+		// Scatter random direction (diffuse material)
+		Vec3 target = rec.p + rec.normal + GenerateRandomVec3(-1,1);
+		return 0.5 * CastRay(new Ray(rec.p, target - rec.p), world, depth-1);
 	}
 
 	// Draw background sky
@@ -58,12 +71,13 @@ void main(){
 				double u = (double(x)+GenerateRandomDouble()) / double(cam.GetScreenWidth()-1);
 				double v = (double(y)+GenerateRandomDouble()) / double(cam.GetScreenHeight()-1);
             	Ray r = cam.GetCameraRay(u,v);
-            	pixelColor = pixelColor + CastRay(r,world);
+				// Accumulate the color
+            	pixelColor = pixelColor + CastRay(r,world, 50);
 			}
 			auto scale = 1.0/ cam.GetSamplesPerPixel();
-			double r = clamp( (255*pixelColor[0]) * scale, 0,255);
-			double g = clamp( (255*pixelColor[1]) * scale, 0,255);
-			double b = clamp( (255*pixelColor[2]) * scale, 0,255);
+			double r = clamp( (255*pixelColor[0] * scale), 0,255);
+			double g = clamp( (255*pixelColor[1] * scale), 0,255);
+			double b = clamp( (255*pixelColor[2] * scale), 0,255);
 			// Write out one pixel of information
 			ppm.SetPixel(x,y,to!ubyte(r), to!ubyte(g), to!ubyte(b));
         }

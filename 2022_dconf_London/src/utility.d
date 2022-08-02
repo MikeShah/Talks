@@ -1,5 +1,7 @@
 module utility;
 
+import vec3;
+
 import std.random;
 
 /// Generate a random double from 0..1
@@ -15,6 +17,13 @@ double GenerateRandomDouble(double min, double max){
 	return min + (max-min)*uniform01(rnd);
 }
 
+Vec3 GenerateRandomVec3(){
+	return new Vec3(GenerateRandomDouble(),GenerateRandomDouble(),GenerateRandomDouble());
+}
+
+Vec3 GenerateRandomVec3(double min, double max){
+	return new Vec3(GenerateRandomDouble(min,max),GenerateRandomDouble(min,max),GenerateRandomDouble(min,max));
+}
 
 /// Test range of GenerateRandomDouble()
 unittest{

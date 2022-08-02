@@ -10,11 +10,11 @@ class Camera{
 	this(){
 		// Screen Aspect Ratio
 		m_aspectRatio 		= 16.0/9.0;
-		m_screenWidth 	= 400;
+		m_screenWidth 	= 300;
 		m_screenHeight = to!uint(m_screenWidth/m_aspectRatio);
 		
 		// Quality Settings
-		m_samplesPerPixel = 100;
+		m_samplesPerPixel = 50;
 		
 		// Camera
 		auto viewportHeight = 2.0;
