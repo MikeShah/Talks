@@ -10,11 +10,12 @@ class Camera{
 	this(){
 		// Screen Aspect Ratio
 		m_aspectRatio 		= 16.0/9.0;
-		m_screenWidth 	= 300;
+		m_screenWidth 	= 400;
 		m_screenHeight = to!uint(m_screenWidth/m_aspectRatio);
 		
 		// Quality Settings
-		m_samplesPerPixel = 50;
+		m_samplesPerPixel 	= 50;
+		m_bounceDepth 		= 50;
 		
 		// Camera
 		auto viewportHeight = 2.0;
@@ -42,8 +43,14 @@ class Camera{
 			return m_screenHeight;
 		}
 
+		/// samples used for anti-aliasing
 		uint GetSamplesPerPixel() const{
 			return m_samplesPerPixel;
+		}
+
+		/// How many times a ray can 'bounce'
+		uint GetMaxBounceDepth() const{
+			return m_bounceDepth;
 		}
 
 		/// Private member variables
@@ -52,7 +59,9 @@ class Camera{
 		private Vec3 m_vertical; 	 
 		private Vec3 m_lowerLeftCorner; 
 
+		// Image quality
 		private uint m_samplesPerPixel; 
+		private uint m_bounceDepth; 
 
 		private const uint m_screenWidth;	
 		private const uint m_screenHeight; 

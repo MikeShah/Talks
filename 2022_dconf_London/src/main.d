@@ -7,6 +7,7 @@ import vec3;
 import sphere;
 import utility;
 import camera;
+import material;
 
 import std.stdio;
 import std.conv;
@@ -32,10 +33,14 @@ Vec3 CastRay(Ray r, Hittable world, int depth){
 	// Note, tMin to 0.0001 to fix shadow 'acne' issue of rays
     //	hitting off of -.00001 instead of t=0
 	if(world.Hit(r,0.0001,10000,rec)){
-		Vec3 test = new Vec3(1.0,1.0,1.0);
-		// Scatter random direction (diffuse material)
-		Vec3 target = rec.p + rec.normal + GenerateRandomVec3(-1,1);
-		return 0.5 * CastRay(new Ray(rec.p, target - rec.p), world, depth-1);
+		Ray scattered;
+		Vec3 attenuation;
+		if(rec.m_material.Scatter(r,rec,attenuation,scattered)){
+			return attenuation * CastRay(scattered,world,depth-1);
+		}
+		else{
+			return new Vec3(0,0,0);
+		}
 	}
 
 	// Draw background sky
@@ -55,8 +60,9 @@ void main(){
     PPM ppm = new PPM(cam.GetScreenWidth(),cam.GetScreenHeight());    
 	// World
 	HittableList world = new HittableList;
-	world.Add(new Sphere(new Vec3(0,0,-1) 	  ,0.5));
-	world.Add(new Sphere(new Vec3(0,-100.5,-1),100));
+	Material ground = new Lambertian(0.0,1.0,0.0);
+	world.Add(new Sphere(new Vec3(0,0,-1) 	  ,0.5, new Lambertian(1.0,0.0,0.0)));
+	world.Add(new Sphere(new Vec3(0,-100.5,-1),100, ground));
 
 	// Iterate through every pixel one (or multiple times)
 	// to generate an image. This is the color of the ray tracer,
@@ -72,7 +78,7 @@ void main(){
 				double v = (double(y)+GenerateRandomDouble()) / double(cam.GetScreenHeight()-1);
             	Ray r = cam.GetCameraRay(u,v);
 				// Accumulate the color
-            	pixelColor = pixelColor + CastRay(r,world, 50);
+            	pixelColor = pixelColor + CastRay(r,world, cam.GetMaxBounceDepth());
 			}
 			auto scale = 1.0/ cam.GetSamplesPerPixel();
 			double r = clamp( (255*pixelColor[0] * scale), 0,255);

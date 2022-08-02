@@ -2,6 +2,7 @@ module sphere;
 
 import vec3;
 import ray;
+import material;
 
 import std.math;
 
@@ -10,6 +11,7 @@ class HitRecord{
     Vec3 normal;
     double t;
 	bool front_face;
+	Material m_material; // This property tells us how to interact when rays intersect this surface.
 	// TODO: Rename member variables
 
 	void SetFaceNormal(ref Ray r, ref Vec3 outwardNormal){
@@ -64,12 +66,15 @@ class Sphere : Hittable{
     this(){ 
 		m_center = new Vec3;
 		m_radius = 0.0;
+		m_material = new Lambertian(1.0,0.0,0.0); // Create a default material
     }
 
-	this(Vec3 center, double radius){
+	this(Vec3 center, double radius, Material material){
 		m_center = new Vec3(0.0,0.0,0.0);
+
 		m_center = center;
 		m_radius = radius;
+		m_material = material;
 	}
 
     bool Hit(Ray r, double tMin, double tMax, ref HitRecord rec){
@@ -100,11 +105,13 @@ class Sphere : Hittable{
 		Vec3 outwardNormal 	= new Vec3;
 		outwardNormal 		= (rec.p - m_center) / m_radius;
 		rec.SetFaceNormal(r,outwardNormal);
+		rec.m_material = m_material;
 
 		// A hit was successfully made
 		return true;
     }
 
+	private Material m_material;
 	private Vec3 m_center;
 	private double m_radius;
 }
