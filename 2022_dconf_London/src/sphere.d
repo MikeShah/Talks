@@ -6,10 +6,10 @@ import material;
 
 import std.math;
 
-class HitRecord{
+struct HitRecord{
     Vec3 p;
     Vec3 normal;
-    double t;
+    float t;
 	bool front_face;
 	Material m_material; // This property tells us how to interact when rays intersect this surface.
 	// TODO: Rename member variables
@@ -21,7 +21,7 @@ class HitRecord{
 }
 
 interface Hittable{
-    bool Hit(Ray r, double tMin, double tMax, ref HitRecord rec);
+    bool Hit(Ray r, float tMin, float tMax, ref HitRecord rec);
 }
 
 class HittableList : Hittable{
@@ -40,8 +40,8 @@ class HittableList : Hittable{
 		// TODO:	
 	}
 
-    override bool Hit(Ray r, double tMin, double tMax, ref HitRecord rec){
-		HitRecord tempRec = new HitRecord;
+    override bool Hit(Ray r, float tMin, float tMax, ref HitRecord rec){
+		HitRecord tempRec;
 		bool hitAnything = false;
 		auto closestSoFar = tMax;
 
@@ -64,37 +64,37 @@ class HittableList : Hittable{
 class Sphere : Hittable{
     /// Constructor
     this(){ 
-		m_center = new Vec3;
+		m_center = Vec3(0);
 		m_radius = 0.0;
 		m_material = new Lambertian(1.0,0.0,0.0); // Create a default material
     }
 
-	this(Vec3 center, double radius, Material material){
-		m_center = new Vec3(0.0,0.0,0.0);
+	this(Vec3 center, float radius, Material material){
+		m_center = Vec3(0);
 
 		m_center = center;
 		m_radius = radius;
 		m_material = material;
 	}
 
-    bool Hit(Ray r, double tMin, double tMax, ref HitRecord rec){
+    bool Hit(Ray r, float tMin, float tMax, ref HitRecord rec){
         Vec3 oc = r.GetOrigin() - m_center;
-		auto a = r.GetDirection().LengthSquared();
+		// auto a = r.GetDirection().LengthSquared();
+		// assert(a.isClose(1));
 		auto half_b = DotProduct(oc,r.GetDirection());
-        double c = oc.LengthSquared() - m_radius*m_radius;
+        float c = oc.LengthSquared() - m_radius*m_radius;
 
 
-		auto discriminant = half_b*half_b - a * c;
+		auto discriminant = half_b*half_b - c;
         if(discriminant< 0){
             return false;
 		}
 
 		auto sqrtdeterminant = sqrt(discriminant);
 
-		// Fid the nearest root that lies in the acceptable range
-        auto root = (-half_b - sqrtdeterminant) / a;
+        auto root = (-half_b - sqrtdeterminant);
 		if(root < tMin || tMax < root){
-			root = (-half_b + sqrtdeterminant) / a;
+			root = (-half_b + sqrtdeterminant);
 			if(root < tMin || tMax < root){
 				return false;
 			}
@@ -102,7 +102,7 @@ class Sphere : Hittable{
 
 		rec.t 				= root;
 		rec.p 				= r.At(rec.t);
-		Vec3 outwardNormal 	= new Vec3;
+		Vec3 outwardNormal 	= Vec3(0);
 		outwardNormal 		= (rec.p - m_center) / m_radius;
 		rec.SetFaceNormal(r,outwardNormal);
 		rec.m_material = m_material;
@@ -113,7 +113,7 @@ class Sphere : Hittable{
 
 	private Material m_material;
 	private Vec3 m_center;
-	private double m_radius;
+	private float m_radius;
 }
 
 

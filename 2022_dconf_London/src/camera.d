@@ -10,7 +10,7 @@ class Camera{
 	this(){
 		// Screen Aspect Ratio
 		m_aspectRatio 		= 16.0/9.0;
-		m_screenWidth 	= 200;
+		m_screenWidth 	= 1920;
 		m_screenHeight = to!uint(m_screenWidth/m_aspectRatio);
 		
 		// Quality Settings
@@ -22,15 +22,16 @@ class Camera{
 		auto viewportWidth 	= m_aspectRatio * viewportHeight;
 		auto focalLength 	= 1.0;
 
-		m_origin 		 = new Vec3(0.0,0.0,0.0);
-		m_horizontal 	 = new Vec3(viewportWidth,0.0,0.0);
-		m_vertical   	 = new Vec3(0.0,viewportHeight,0.0);
-		m_lowerLeftCorner = m_origin - (m_horizontal/2.0) - (m_vertical/2.0) - (new Vec3(0.0,0.0,focalLength));
+		m_origin 		 = Vec3(0.0,0.0,0.0);
+		m_horizontal 	 = Vec3(viewportWidth,0.0,0.0);
+		m_vertical   	 = Vec3(0.0,viewportHeight,0.0);
+		m_lowerLeftCorner = m_origin - (m_horizontal/2.0) - (m_vertical/2.0) - (Vec3(0.0,0.0,focalLength));
 	}
 
 		/// Cast a ray from the camera
-		Ray GetCameraRay(double u, double v){
-			return new Ray(m_origin,m_lowerLeftCorner + u*m_horizontal + v*m_vertical - m_origin);
+		Ray GetCameraRay(float u, float v){
+			auto dir = m_lowerLeftCorner + u*m_horizontal + v*m_vertical - m_origin;
+			return Ray(m_origin, dir.Normalized);
 		}
 
 		/// Retrieve the screen Width
@@ -65,5 +66,5 @@ class Camera{
 
 		private const uint m_screenWidth;	
 		private const uint m_screenHeight; 
-		private double m_aspectRatio; 		
+		private float m_aspectRatio;
 }
