@@ -33,3 +33,21 @@ class Lambertian : Material{
 }
 
 
+class Metal : Material{
+	this(double r, double g, double b){
+		m_albedo = new Vec3(r,g,b);
+	}
+	this(Vec3 color){
+		m_albedo = color;
+	}
+
+	override bool Scatter(ref Ray r, HitRecord rec, ref Vec3 attenuation, ref Ray scattered){
+		Vec3 reflected = Reflect(r.GetDirection().ToUnitVector(), rec.normal);
+		scattered = new Ray(rec.p, reflected);
+		attenuation = m_albedo;
+	
+		return (DotProduct(scattered.GetDirection(), rec.normal) > 0);
+	}
+
+	private Vec3 m_albedo;
+}

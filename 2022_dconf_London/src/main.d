@@ -61,7 +61,11 @@ void main(){
 	// World
 	HittableList world = new HittableList;
 	Material ground = new Lambertian(0.0,1.0,0.0);
-	world.Add(new Sphere(new Vec3(0,0,-1) 	  ,0.5, new Lambertian(1.0,0.0,0.0)));
+	Material metal 	= new Metal(1.0,0.0,0.0);
+
+	world.Add(new Sphere(new Vec3(0,0,-1) 	  ,0.5, new Lambertian(0.6,0.6,0.6)));
+	world.Add(new Sphere(new Vec3(1,0,-1) 	  ,0.5, metal));
+	world.Add(new Sphere(new Vec3(-1,0,-1) 	  ,0.5, metal));
 	world.Add(new Sphere(new Vec3(0,-100.5,-1),100, ground));
 
 	// Iterate through every pixel one (or multiple times)

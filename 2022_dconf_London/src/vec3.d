@@ -107,6 +107,7 @@ class Vec3{
         return to!string(X())~","~to!string(Y())~","~to!string(Z()); 
     }
 
+
     /// Unary operators
     Vec3 opUnary(string s)() if (s == "-"){
         e[0] = -e[0];
@@ -242,6 +243,15 @@ Vec3 CrossProduct(const Vec3 v1, const Vec3 v2){
     float z = v1.X()*v2.Y() - v1.Y()*v2.X();
 
     return new Vec3(x,y,z);
+}
+
+/// Reflect a vector in the opposite direction
+/// n is the normal (and should be a unit vector)
+/// v is the incoming ray.
+/// What is returned is reflected ray from the normal
+// TODO Write some unit tests for this function
+Vec3 Reflect(Vec3 v, Vec3 n){
+	return v - 2*DotProduct(v,n)*n;
 }
 
 
