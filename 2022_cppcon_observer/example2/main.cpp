@@ -15,14 +15,42 @@ class IObserver{
 		virtual std::string GetName() const= 0 ;
 };
 
-// Watcher is derived from IObserver
-class Watcher : public IObserver{
+// SoundEvent is derived from IObserver
+class SoundEvent : public IObserver{
 	public:
-		explicit Watcher(const std::string& name) : mName(name){
+		explicit SoundEvent(const std::string& name) : mName(name){
+		}
+		// Do something 'physics like'
+		void OnNotify(){
+			std::cout << mName << " Sound engine did something" << std::endl;
 		}
 
+		std::string GetName() const override { return mName; }
+	private:
+		std::string mName;
+};
+// PhysicsEvent is derived from IObserver
+class PhysicsEvent : public IObserver{
+	public:
+		explicit PhysicsEvent(const std::string& name) : mName(name){
+		}
+		// Do something 'physics like'
 		void OnNotify(){
-			std::cout << mName << "-hello!" << std::endl;
+			std::cout << mName << " physics engine did something" << std::endl;
+		}
+
+		std::string GetName() const override { return mName; }
+	private:
+		std::string mName;
+};
+// LogEvent is derived from IObserver
+class LogEvent : public IObserver{
+	public:
+		explicit LogEvent(const std::string& name) : mName(name){
+		}
+		// Do something 'physics like'
+		void OnNotify(){
+			std::cout << mName << " log did something" << std::endl;
 		}
 
 		std::string GetName() const override { return mName; }
@@ -31,8 +59,10 @@ class Watcher : public IObserver{
 };
 
 // example2/main.cpp
-// Now we have converted 'Subject' to 'ISubject'
-// 'ISubject' now works with our IObserver interface
+// Our 'subject' will now be able to handle different
+// types of 'messages/events/keys' that happen.
+// This opens our subject up to working with different 
+// subsystems, but still staying decoupled.
 class ISubject{
 	public:
 		ISubject() {};
@@ -72,6 +102,7 @@ class ISubject{
 			}
 		}
 
+		// example2/main.cpp
 		// New function to notify everything
 		virtual void NotifyAll(){
 			// Search through every message type (our keys)
@@ -108,9 +139,13 @@ class SomeSubject : public ISubject{
 int main(){
 
 	SomeSubject subject;
-	Watcher watcher1("watcher1");
-	Watcher watcher2("watcher2");
-	Watcher watcher3("watcher3");
+	// Each of our 'watchers' are derived from IObserver.
+	// They are each event types that can 'subscribe' to 
+	// a subject, and when they're notified, do something 
+	// specific to that subsystem, without being coupled.
+	SoundEvent 		watcher1("watcher1");
+	PhysicsEvent 	watcher2("watcher2");
+	LogEvent 		watcher3("watcher3");
 
 	subject.AddObserver(SomeSubject::PLAYSOUND, 	&watcher1);
 	subject.AddObserver(SomeSubject::HANDLEPHYSICS, &watcher2);
