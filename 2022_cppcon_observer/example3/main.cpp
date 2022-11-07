@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <forward_list>
-#include <map>          // New data structure
+#include <unordered_map>          // New data structure
 #include <memory> 		// shared_ptr
 
 // Different types of messages
@@ -75,7 +75,7 @@ class ISubject{
 		// Message is the 'key' or 'event' that we want to handle.
 		// 'observer' is the observer we'll add to the events
 		virtual void AddObserver(MessageTypes message, std::shared_ptr<IObserver>& observer){
-			// Check to see if our 'key' or 'event type' is in our map
+			// Check to see if our 'key' or 'event type' is in our unordered_map
 			auto it = mObservers.find(message);
 			if(it==mObservers.end()){
 				// Since we did not find our message, we need
@@ -87,10 +87,10 @@ class ISubject{
 		}
 
 		virtual void RemoveObserver(MessageTypes message, std::shared_ptr<IObserver>& observer){
-			// Check to see if our 'key' or 'event type' is in our map
+			// Check to see if our 'key' or 'event type' is in our unordered_map
 			auto it = mObservers.find(message);
 			if(it != mObservers.end()){
-				// Find the right bucket in our map to find
+				// Find the right bucket in our unordered_map to find
 				ObserversList& list = mObservers[message];
 				// Now search through the list to erase our observer 
 				for(ObserversList::iterator li = list.begin();
@@ -126,10 +126,10 @@ class ISubject{
 	private:
 		// Two typedefs here, one for the list of observers (same as before)
 		typedef std::forward_list<std::shared_ptr<IObserver>> 	ObserversList;
-		// The map is going to store 'int' as the key.
+		// The unordered_map is going to store 'int' as the key.
 		// The key is for each of the 'messages'
-		// Then, the value in our map is a forward_list as previous
-		typedef std::map<MessageTypes, ObserversList> 		ObserversMap;
+		// Then, the value in our unordered_map is a forward_list as previous
+		typedef std::unordered_map<MessageTypes, ObserversList> 		ObserversMap;
 		ObserversMap mObservers;
 };
 
