@@ -4,16 +4,23 @@ import vec3;
 
 import std.random;
 
+// global random number generator
+Random rnd;
+
+// Initialize once in the module our random
+// number generator.
+static this(){
+    rnd = Random(unpredictableSeed);
+}
+
 /// Generate a random double from 0..1
 double GenerateRandomDouble(){
-	auto rnd = Random(unpredictableSeed);
 	return uniform01(rnd);
 }
 
 
 /// Generate a random double from a range
 double GenerateRandomDouble(double min, double max){
-	auto rnd = Random(unpredictableSeed);
 	return min + (max-min)*uniform01(rnd);
 }
 

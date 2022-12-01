@@ -15,9 +15,6 @@ import std.math.traits;
 import std.math;
 import std.algorithm;
 
-
-
-
 /// Cast a ray out into the screen
 /// 'ray' is where the ray is cast
 /// world can be a single object or collection to test intersection.
