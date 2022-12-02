@@ -24,7 +24,7 @@ class Lambertian : Material{
 			scatterDirection = rec.normal;
 		}
 
-		scattered = new Ray(rec.p, scatterDirection);
+		scattered = Ray(rec.p, scatterDirection);
 		attenuation = m_albedo;
 		return true;
 	}
@@ -43,7 +43,7 @@ class Metal : Material{
 
 	override bool Scatter(ref Ray r, HitRecord rec, ref Vec3 attenuation, ref Ray scattered){
 		Vec3 reflected = Reflect(r.GetDirection().ToUnitVector(), rec.normal);
-		scattered = new Ray(rec.p, reflected);
+		scattered = Ray(rec.p, reflected);
 		attenuation = m_albedo;
 	
 		return (DotProduct(scattered.GetDirection(), rec.normal) > 0);

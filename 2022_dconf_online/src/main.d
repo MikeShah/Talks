@@ -20,7 +20,7 @@ import std.algorithm;
 /// world can be a single object or collection to test intersection.
 /// depth is the maximum number of 'bounces' for the ray
 Vec3 CastRay(Ray r, Hittable world, int depth){
-	HitRecord rec = new HitRecord;
+	HitRecord rec;
 	// Check our base case
 	if(depth <=0){
 		return Vec3(0,0,0);

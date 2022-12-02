@@ -30,7 +30,7 @@ class Camera{
 
 		/// Cast a ray from the camera
 		Ray GetCameraRay(double u, double v){
-			return new Ray(m_origin,m_lowerLeftCorner + u*m_horizontal + v*m_vertical - m_origin);
+			return Ray(m_origin,m_lowerLeftCorner + u*m_horizontal + v*m_vertical - m_origin);
 		}
 
 		/// Retrieve the screen Width

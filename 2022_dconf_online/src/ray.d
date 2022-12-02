@@ -2,7 +2,7 @@ module ray;
 
 import vec3;
 
-class Ray{
+struct Ray{
     /// Constructor
     // TODO: pass in origin and direction by reference
     this(Vec3 origin, Vec3 direction){
@@ -28,7 +28,7 @@ class Ray{
     }
 
     /// Override toString for convenient printing 
-    override string toString(){
+    string toString(){
         import std.stdio;
         import std.conv;
         return "origin: "~m_origin.toString()~" direction: "~m_direction.toString();  
@@ -42,6 +42,6 @@ class Ray{
 unittest{
     Ray r =  new Ray(new Vec3(0.0,0.0,0.0), new Vec3(0.0,0.0,1.0));
 
-    Vec3 expectedResult = new Vec3(0.0,0.0,0.5);
+    Vec3 expectedResult = Vec3(0.0,0.0,0.5);
    // assert(r.At(0.5) == expectedResult);
 }

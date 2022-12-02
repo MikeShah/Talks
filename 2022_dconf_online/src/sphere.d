@@ -6,7 +6,7 @@ import material;
 
 import std.math;
 
-class HitRecord{
+struct HitRecord{
     Vec3 p;
     Vec3 normal;
     double t;
@@ -41,7 +41,7 @@ class HittableList : Hittable{
 	}
 
     override bool Hit(Ray r, double tMin, double tMax, ref HitRecord rec){
-		HitRecord tempRec = new HitRecord;
+		HitRecord tempRec;
 		bool hitAnything = false;
 		auto closestSoFar = tMax;
 
