@@ -64,13 +64,13 @@ class HittableList : Hittable{
 class Sphere : Hittable{
     /// Constructor
     this(){ 
-		m_center = new Vec3;
+		m_center = Vec3(0.0,0.0,0.0);
 		m_radius = 0.0;
 		m_material = new Lambertian(1.0,0.0,0.0); // Create a default material
     }
 
 	this(Vec3 center, double radius, Material material){
-		m_center = new Vec3(0.0,0.0,0.0);
+		m_center = Vec3(0.0,0.0,0.0);
 
 		m_center = center;
 		m_radius = radius;
@@ -102,7 +102,7 @@ class Sphere : Hittable{
 
 		rec.t 				= root;
 		rec.p 				= r.At(rec.t);
-		Vec3 outwardNormal 	= new Vec3;
+		Vec3 outwardNormal 	= Vec3(0.0,0.0,0.0);
 		outwardNormal 		= (rec.p - m_center) / m_radius;
 		rec.SetFaceNormal(r,outwardNormal);
 		rec.m_material = m_material;

@@ -22,10 +22,10 @@ class Camera{
 		auto viewportWidth 	= m_aspectRatio * viewportHeight;
 		auto focalLength 	= 1.0;
 
-		m_origin 		 = new Vec3(0.0,0.0,0.0);
-		m_horizontal 	 = new Vec3(viewportWidth,0.0,0.0);
-		m_vertical   	 = new Vec3(0.0,viewportHeight,0.0);
-		m_lowerLeftCorner = m_origin - (m_horizontal/2.0) - (m_vertical/2.0) - (new Vec3(0.0,0.0,focalLength));
+		m_origin 		 = Vec3(0.0,0.0,0.0);
+		m_horizontal 	 = Vec3(viewportWidth,0.0,0.0);
+		m_vertical   	 = Vec3(0.0,viewportHeight,0.0);
+		m_lowerLeftCorner = m_origin - (m_horizontal/2.0) - (m_vertical/2.0) - (Vec3(0.0,0.0,focalLength));
 	}
 
 		/// Cast a ray from the camera

@@ -9,15 +9,14 @@
  */
 module vec3;
 
-class Vec3{
+struct Vec3{
     import std.meta;
     import std.math;
 
     /// Constructor for a Vec3
-    this(){
-        e[0] = 0.0;
-        e[1] = 0.0;
-        e[2] = 0.0;
+    /// Initializes each element to 'e'
+    this(double e){
+        this(e,e,e);
     }
     /// Constructor initializing the elements
     this(double e0, double e1, double e2){
@@ -100,8 +99,8 @@ class Vec3{
 
     }
 
-    /// Prints out the vector to stdout
-    override string toString(){
+    /// Outputs a string
+    string toString(){
         import std.stdio;
         import std.conv;
         return to!string(X())~","~to!string(Y())~","~to!string(Z()); 
@@ -119,8 +118,12 @@ class Vec3{
     /// Return an individual index
     // TODO: See if I can bounds check i or use
     //       a contract
-    ref double opIndex(uint i) { 
+    double opIndex(uint i) { 
         return e[i]; 
+    }
+
+    double opIndexAssign(double value, uint i) { 
+        return e[i] = value; 
     }
 
 
@@ -140,7 +143,7 @@ class Vec3{
     /// Binary Operations with a Vector
     // TODO: Add operations for +=, -=, /=, *=, etc.
     auto opBinary(string op)(const Vec3 rhs){
-        Vec3 result = new Vec3(0.0,0.0,0.0);
+        Vec3 result = Vec3(0.0,0.0,0.0);
         if(op=="*"){ 
            result[0] = e[0] * rhs.e[0];
            result[1] = e[1] * rhs.e[1];
@@ -168,7 +171,7 @@ class Vec3{
     /// Handle multiplication and division of a scalar
     /// for a vector
     Vec3 opBinary(string op)(double rhs){
-        Vec3 result = new Vec3(0.0,0.0,0.0);
+        Vec3 result = Vec3(0.0,0.0,0.0);
         if(op=="*"){ 
            result[0] = e[0] * rhs;
            result[1] = e[1] * rhs;
@@ -197,7 +200,7 @@ class Vec3{
     // TODO: Explain why we need opBinaryRight and
     //       opBinary operations
     Vec3 opBinaryRight(string op)(double rhs){
-        Vec3 result = new Vec3(0.0,0.0,0.0);
+        Vec3 result = Vec3(0.0,0.0,0.0);
         if(op=="*"){ 
            result[0] = e[0] * rhs;
            result[1] = e[1] * rhs;
@@ -242,7 +245,7 @@ Vec3 CrossProduct(const Vec3 v1, const Vec3 v2){
     float y = v1.Z()*v2.X() - v1.X()*v2.Z();
     float z = v1.X()*v2.Y() - v1.Y()*v2.X();
 
-    return new Vec3(x,y,z);
+    return Vec3(x,y,z);
 }
 
 /// Reflect a vector in the opposite direction

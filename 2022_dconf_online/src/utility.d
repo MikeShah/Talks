@@ -25,11 +25,11 @@ double GenerateRandomDouble(double min, double max){
 }
 
 Vec3 GenerateRandomVec3(){
-	return new Vec3(GenerateRandomDouble(),GenerateRandomDouble(),GenerateRandomDouble());
+	return Vec3(GenerateRandomDouble(),GenerateRandomDouble(),GenerateRandomDouble());
 }
 
 Vec3 GenerateRandomVec3(double min, double max){
-	return new Vec3(GenerateRandomDouble(min,max),GenerateRandomDouble(min,max),GenerateRandomDouble(min,max));
+	return Vec3(GenerateRandomDouble(min,max),GenerateRandomDouble(min,max),GenerateRandomDouble(min,max));
 }
 
 /// Test range of GenerateRandomDouble()

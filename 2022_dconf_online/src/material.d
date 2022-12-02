@@ -11,7 +11,7 @@ interface Material{
 
 class Lambertian : Material{
 	this(double r, double g, double b){
-		m_albedo = new Vec3(r,g,b);
+		m_albedo = Vec3(r,g,b);
 	}
 	this(Vec3 color){
 		m_albedo = color;
@@ -35,7 +35,7 @@ class Lambertian : Material{
 
 class Metal : Material{
 	this(double r, double g, double b){
-		m_albedo = new Vec3(r,g,b);
+		m_albedo = Vec3(r,g,b);
 	}
 	this(Vec3 color){
 		m_albedo = color;
