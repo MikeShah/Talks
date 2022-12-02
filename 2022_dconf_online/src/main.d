@@ -69,8 +69,13 @@ void main(){
 	// to generate an image. This is the color of the ray tracer,
 	// that shoots out at least one ray per pixel, testing for intersections
 	// with an object.
-    for(int y=cam.GetScreenHeight()-1; y >=0; --y){
-        for(int x= 0; x < cam.GetScreenWidth(); ++x){
+    import std.parallelism;
+    import std.range;
+    foreach(y ; cam.GetScreenHeight.iota.parallel){
+        foreach(x; cam.GetScreenWidth().iota.parallel){
+//    for(int y=cam.GetScreenHeight()-1; y >=0; --y){
+//        for(int x= 0; x < cam.GetScreenWidth(); ++x){
+
             // Cast ray into scene
 			// Accumulate the pixel color from multiple samples
 			Vec3 pixelColor = Vec3(0.0,0.0,0.0);
