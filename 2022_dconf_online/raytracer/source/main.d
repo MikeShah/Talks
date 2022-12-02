@@ -15,6 +15,7 @@ import std.math.traits;
 import std.math;
 import std.algorithm;
 
+
 /// Cast a ray out into the screen
 /// 'ray' is where the ray is cast
 /// world can be a single object or collection to test intersection.
@@ -47,6 +48,54 @@ Vec3 CastRay(Ray r, Hittable world, int depth){
     return ((1.0-t)*(Vec3(0.5,0.7,1.0))) + t*(Vec3(1.0,1.0,1.0));
 }
 
+/// Create a new world from a json file
+void LoadWorld(ref HittableList world, string jsonfile){
+    import std.file;
+    import std.json;
+    import std.conv;
+
+    // Setup the materials in our world
+    // Could move this to .json file as well!
+	Material ground     = new Lambertian(0.0,1.0,0.0);
+	Material metal 	    = new Metal(1.0,0.0,0.0);
+    Material lambertian = new Lambertian(0.6, 0.6, 0.6);
+
+    // Check if the json file exists
+    if(exists(jsonfile)){
+        // Read in a text-based file.
+        string content = readText(jsonfile);
+
+        // Note: Assume it is a valid .json file, 
+        // then parse the json contents
+        auto j= parseJSON(content);
+
+        // Find our objects
+        if("objects" in j){
+            foreach(element; j["objects"].array){
+                auto property = element["Sphere"].array;
+                Vec3 position = Vec3(property[0].floating,
+                                     property[1].floating,
+                                     property[2].floating);
+                float radius = property[3].floating;
+
+                // Create the object
+                if(property[4].str=="Lambertian"){
+                    Sphere s = new Sphere(position,radius,lambertian);
+                    world.Add(s);
+                }
+                else if(property[4].str=="metal"){
+                    Sphere s = new Sphere(position,radius,metal);
+                    world.Add(s);
+                }
+                else if(property[4].str=="ground"){
+                    Sphere s = new Sphere(position,radius,ground);
+                    world.Add(s);
+                }
+            }
+        }
+    }
+}
+
 
 void main(){
 
@@ -57,13 +106,8 @@ void main(){
     PPM ppm = new PPM(cam.GetScreenWidth(),cam.GetScreenHeight());    
 	// World
 	HittableList world = new HittableList;
-	Material ground = new Lambertian(0.0,1.0,0.0);
-	Material metal 	= new Metal(1.0,0.0,0.0);
-
-	world.Add(new Sphere(Vec3(0,0,-1) 	  ,0.5, new Lambertian(0.6,0.6,0.6)));
-	world.Add(new Sphere(Vec3(1,0,-1) 	  ,0.5, metal));
-	world.Add(new Sphere(Vec3(-1,0,-1) 	  ,0.5, metal));
-	world.Add(new Sphere(Vec3(0,-100.5,-1),100, ground));
+    // Load the file from a .json file
+    LoadWorld(world,"./input/world.json");
 
 	// Iterate through every pixel one (or multiple times)
 	// to generate an image. This is the color of the ray tracer,
