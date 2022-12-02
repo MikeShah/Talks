@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"mike"
+	],
+	"copyright": "Copyright © 2022, mike",
+	"description": "Ray tracer from the dconf presentation",
+	"license": "proprietary",
+	"name": "raytracer"
+}
