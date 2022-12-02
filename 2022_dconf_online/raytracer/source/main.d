@@ -56,9 +56,9 @@ void LoadWorld(ref HittableList world, string jsonfile){
 
     // Setup the materials in our world
     // Could move this to .json file as well!
-	Material ground     = new Lambertian(0.0,1.0,0.0);
+	Material ground     = new Lambertian(0.6,0.1,0.1);
 	Material metal 	    = new Metal(1.0,0.0,0.0);
-    Material lambertian = new Lambertian(0.6, 0.6, 0.6);
+    Material lambertian = new Lambertian(0.9, 0.6, 0.6);
 
     // Check if the json file exists
     if(exists(jsonfile)){
