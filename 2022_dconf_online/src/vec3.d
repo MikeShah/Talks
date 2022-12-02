@@ -32,7 +32,7 @@ struct Vec3{
     }
     
     /// Returns the length of the vector
-    double Length() const{
+    double Length() const pure{
         if(IsZero()){
             return 0;
         }
@@ -45,7 +45,7 @@ struct Vec3{
 
     /// Returns the length of a vector squared,
 	/// thus avoiding a sqrt operation
-    double LengthSquared() const{
+    double LengthSquared() const pure{
         if(IsZero()){
             return 0;
         }
@@ -54,7 +54,7 @@ struct Vec3{
     }
 
     /// Normalize a vector into a unit vector
-    void Normalize() {
+    void Normalize() pure {
         if( !IsZero()){
             double length = Length();
             e[0] /= length;
@@ -71,14 +71,14 @@ struct Vec3{
     double Z() const { return e[2]; }
 
     /// Test if this is a zero vector
-    bool IsZero() const{
+    bool IsZero() const pure{
         return (abs(e[0]) <= 0.000001 &&
                 abs(e[1]) <= 0.000001 && 
                 abs(e[2]) <= 0.000001);
     }
 
     /// Retrieve a unit vector
-    Vec3 ToUnitVector(){
+    Vec3 ToUnitVector() pure{
         // Compute the length once
         auto len = Length();
         // TODO: Throw exceptoin if lenth is 0
@@ -91,7 +91,7 @@ struct Vec3{
     }
 
     /// Return true or false if this is a unit vector
-    bool IsUnitVector() const{
+    bool IsUnitVector() const pure{
         if( abs(sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]) -1.0) < 0.000001){
             return true;
         }
@@ -144,26 +144,11 @@ struct Vec3{
     // TODO: Add operations for +=, -=, /=, *=, etc.
     auto opBinary(string op)(const Vec3 rhs){
         Vec3 result = Vec3(0.0,0.0,0.0);
-        if(op=="*"){ 
-           result[0] = e[0] * rhs.e[0];
-           result[1] = e[1] * rhs.e[1];
-           result[2] = e[2] * rhs.e[2];
-        }
-        else if(op=="/"){ 
-           result[0] = e[0] / rhs.e[0];
-           result[1] = e[1] / rhs.e[1];
-           result[2] = e[2] / rhs.e[2];
-        }
-        else if(op=="+"){ 
-           result[0] = e[0] + rhs.e[0];
-           result[1] = e[1] + rhs.e[1];
-           result[2] = e[2] + rhs.e[2];
-        }
-        else if(op=="-"){ 
-           result[0] = e[0] - rhs.e[0];
-           result[1] = e[1] - rhs.e[1];
-           result[2] = e[2] - rhs.e[2];
-        }
+        
+        mixin("result[0] = e[0] ", op, " rhs.e[0];");
+        mixin("result[1] = e[1] ", op, " rhs.e[1];");
+        mixin("result[2] = e[2] ", op, " rhs.e[2];");
+
         return result;
     }
 
@@ -172,26 +157,11 @@ struct Vec3{
     /// for a vector
     Vec3 opBinary(string op)(double rhs){
         Vec3 result = Vec3(0.0,0.0,0.0);
-        if(op=="*"){ 
-           result[0] = e[0] * rhs;
-           result[1] = e[1] * rhs;
-           result[2] = e[2] * rhs;
-        }
-        else if(op=="/"){ 
-           result[0] = e[0] / rhs;
-           result[1] = e[1] / rhs;
-           result[2] = e[2] / rhs;
-        }
-        else if(op=="+"){ 
-           result[0] = e[0] + rhs;
-           result[1] = e[1] + rhs;
-           result[2] = e[2] + rhs;
-        }
-        else if(op=="-"){ 
-           result[0] = e[0] - rhs;
-           result[1] = e[1] - rhs;
-           result[2] = e[2] - rhs;
-        }
+
+        mixin("result[0] = e[0] ", op, " rhs;");
+        mixin("result[1] = e[1] ", op, " rhs;");
+        mixin("result[2] = e[2] ", op, " rhs;");
+
         return result;
     }
 
@@ -201,26 +171,11 @@ struct Vec3{
     //       opBinary operations
     Vec3 opBinaryRight(string op)(double rhs){
         Vec3 result = Vec3(0.0,0.0,0.0);
-        if(op=="*"){ 
-           result[0] = e[0] * rhs;
-           result[1] = e[1] * rhs;
-           result[2] = e[2] * rhs;
-        }
-        else if(op=="/"){ 
-           result[0] = e[0] / rhs;
-           result[1] = e[1] / rhs;
-           result[2] = e[2] / rhs;
-        }
-        else if(op=="+"){ 
-           result[0] = e[0] + rhs;
-           result[1] = e[1] + rhs;
-           result[2] = e[2] + rhs;
-        }
-        else if(op=="-"){ 
-           result[0] = e[0] - rhs;
-           result[1] = e[1] - rhs;
-           result[2] = e[2] - rhs;
-        }
+
+        mixin("result[0] = e[0] ", op, " rhs;");
+        mixin("result[1] = e[1] ", op, " rhs;");
+        mixin("result[2] = e[2] ", op, " rhs;");
+
         return result;
     }
 
@@ -231,7 +186,7 @@ struct Vec3{
 
 
 /// Compute the dot product of two vectors
-double DotProduct(const Vec3 v1, const Vec3 v2){
+double DotProduct(const Vec3 v1, const Vec3 v2) {
     if(v1.IsZero() && v2.IsZero()){
         return 0;
     }
