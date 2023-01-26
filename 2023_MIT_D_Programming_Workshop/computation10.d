@@ -13,7 +13,7 @@ void main()
 
     // Try searching https://dlang.org/phobos/std_algorithm.html
     // 
-    // Challenge (1): Remove all duplicates and reverse the data
+    // Challenge (1): Sort (largest number first) and remove all duplicates
     // Challenge (2) : Count all of the elements greater than the mean
     //
     // Constraints:
