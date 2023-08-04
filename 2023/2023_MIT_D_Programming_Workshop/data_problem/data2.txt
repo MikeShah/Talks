@@ -1,0 +1,4 @@
+Sue Bird,4,
+Lisa Leslie, 2,
+Shaquille o'Neal,4,
+Hakeem Olajuwon, 2,
