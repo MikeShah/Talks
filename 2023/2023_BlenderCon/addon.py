@@ -5,17 +5,17 @@ bl_info = {
     "category": "Object",
 }
 
-# Note: This dictionary must be at the top of our file
+# Note: ^ This dictionary (bl_info) must be at the top of our file
 #       (Usually with one space above) 
 
 import bpy  # Blender Python API
 import time # Used for time keeping
 
 
-class ObjectMoveX(bpy.types.Operator):
+class ObjectComputeBoundingBox(bpy.types.Operator):
     """Simple example showing you how to compute bounding box""" # Use this as a tooltip for menu items and buttons.
-    bl_idname = "ComputeBoundingBox.tutorial"                   # Unique identifier for buttons and menu items to reference.
-    bl_label = "Compute Bounding Box BCon"                      # Display name in the interface.
+    bl_idname = "object.computebunding_box"             # Unique identifier for buttons and menu items to reference.
+    bl_label = "Compute Bounding Box BCon"                       # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
 
     def execute(self, context):        # execute() is called when running the operator.
@@ -152,19 +152,17 @@ class ObjectMoveX(bpy.types.Operator):
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
 
 def menu_func(self, context):
-    self.layout.operator(ObjectMoveX.bl_idname)
+    self.layout.operator(ObjectComputeBoundingBox.bl_idname)
 
 def register():
-    bpy.utils.register_class(ObjectMoveX)
+    bpy.utils.register_class(ObjectComputeBoundingBox)
     bpy.types.VIEW3D_MT_object.append(menu_func)  # Adds the new operator to an existing menu.
 
 def unregister():
-    bpy.utils.unregister_class(ObjectMoveX)
+    bpy.utils.unregister_class(ObjectComputeBoundingBox)
 
 
 # This allows you to run the script directly from Blender's Text editor
 # to test the add-on without having to install it.
 if __name__ == "__main__":
     register()
-
-
