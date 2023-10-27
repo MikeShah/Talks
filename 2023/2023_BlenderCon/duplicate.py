@@ -1,4 +1,5 @@
 # Another example script for duplicating an objects geometry
+# If you have other attirbutes (e.g. uv's, etc. you'll need to copy those as well)
 import bpy
 
 print("Starting Duplicate Box Script")
