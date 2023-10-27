@@ -5,10 +5,9 @@ import bpy
 
 import time
 
-start_time = time.time()
 
-print("Starting Script")
-
+'''
+print("Starting Duplicate Box Script")
 # Select the active object
 myObject = bpy.context.active_object
 
@@ -65,7 +64,12 @@ duplicate_object = bpy.data.objects.new(duplicate_name, duplicate_mesh)
 # Link in the mesh to a scene so we can actually view it.
 bpy.data.collections['Collection'].objects.link(duplicate_object)
 
+'''
+
 # =========== Bounding Box Script ===========
+start_time = time.time()
+print("Starting Bounding Box Script")
+
 # Select the active object
 active_obj = bpy.context.active_object
 
@@ -79,10 +83,10 @@ zValues = []
 # Only compute bounding box based on
 # the vertices if they are selected
 for v in active_object_verts:  
-   # if v.select == True:
-    xValues.append(v.co[0])   
-    yValues.append(v.co[1])  
-    zValues.append(v.co[2]) 
+    if v.select == True:
+        xValues.append(v.co[0])   
+        yValues.append(v.co[1])  
+        zValues.append(v.co[2]) 
     
 # Iterate through the values we have stored
 # and grab the bounds
@@ -151,7 +155,7 @@ bounding_verts[6] = [maxx,maxy,minz]
 bounding_verts[7] = [maxx,maxy,maxz]
 
 # New mesh name
-bounding_name = "bounding_"+myObject.name
+bounding_name = "bounding_"+active_obj.name
 # Create a new 'empty mesh'
 bounding_mesh= bpy.data.meshes.new(bounding_name)
 # Populate the mesh with geometry data
@@ -171,7 +175,7 @@ bpy.data.objects[bounding_name].display_type = 'WIRE'
 
 # Another option is to make our target object the parent
 # so that the bounding box transforms with it.
-bounding_object.parent = myObject
+bounding_object.parent = active_obj
 
 # Unselect every object
 for obj in bpy.data.objects:
@@ -185,3 +189,4 @@ print("Made to end in: ",time.time()-start_time)
 
 # Another idea if time
 # Creating a bounding box around selected faces or vertices
+
