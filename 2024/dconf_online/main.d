@@ -1,3 +1,4 @@
+// Hello world
 // dmd main.d -L-L/usr/local/lib -L-lglfw3 -of=prog
 import std.stdio;
 import glad.gl.all;
@@ -36,6 +37,16 @@ extern(C){
     GLFWglproc  glfwGetProcAddress (const char *procname);
 }
 
+void glInformation(){
+    import std.string;
+
+    // fromStringz is used here to properly convert the C-string
+    writeln(fromStringz(cast(const char*)glGetString(GL_VENDOR)));
+    writeln(fromStringz(cast(const char*)glGetString(GL_RENDERER)));
+    writeln(fromStringz(cast(const char*)glGetString(GL_VERSION)));
+    writeln(fromStringz(cast(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
+}
+
 void loop(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
@@ -70,15 +81,6 @@ void loop(){
     glfwDestroyWindow(window);
 }
 
-void glInformation(){
-    import std.string;
-
-    // fromStringz is used here to properly convert the C-string
-    writeln(fromStringz(cast(const char*)glGetString(GL_VENDOR)));
-    writeln(fromStringz(cast(const char*)glGetString(GL_RENDERER)));
-    writeln(fromStringz(cast(const char*)glGetString(GL_VERSION)));
-    writeln(fromStringz(cast(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
-}
 
 /// Program entry point 
 /// NOTE: When debugging, this is '_Dmain'
