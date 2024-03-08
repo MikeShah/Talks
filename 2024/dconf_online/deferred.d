@@ -48,7 +48,6 @@ shared static this(){
 
 
 
-
 struct Globals{
     GLuint graphicsPipelineShaderProgram = 0;
     GLuint vertexArrayObject		     = 0;
@@ -58,48 +57,35 @@ struct Globals{
 }
 
 
-
-
 /**
   appender allows for more efficient allocations
 */
-const(char*)[] LoadShaderAsStrings(const string filename){
+char[] LoadShaderAsString(string filename){
     import std.file;
-    import std.array;
-    import std.conv;
-    import std.string;
+    import std.stdio;
 
-    auto file = File(filename);
-    const(char*)[] lines;
+    if(exists(filename)){
+        auto file = File(filename);
 
-    foreach(line; file.byLine()){
-        lines ~= line.ptr;
+
+        writeln(file.size);
+        char[] bytes = new char[file.size];
+        file.rawRead(bytes);
+
+        writeln("bytes:",bytes);
+
+        return bytes;
     }
-    
-
-    writeln(lines);
-
-    const(char*)[] linez;
-    foreach(l ; lines){
-        linez ~= l;
-    }
-    // Convert to match OpenGL API
-
-    return linez;
+    return null;
 }
 
 
 /**
 * CompileShader will compile any valid vertex, fragment, geometry, tesselation, or compute shader.
-* e.g.
-*	    Compile a vertex shader: 	CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
-*       Compile a fragment shader: 	CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-*
-* @param type We use the 'type' field to determine which shader we are going to compile.
-* @param source : The shader source code.
-* @return id of the shaderObject
 */
-GLuint CompileShader(GLuint type, const(char*)* source){
+GLuint CompileShader(GLuint type, char[] source){
+    import std.string;
+
 	// Compile our shaders
 	GLuint shaderObject;
 
@@ -112,7 +98,12 @@ GLuint CompileShader(GLuint type, const(char*)* source){
 	}
 
 	// The source of our shader
-	glShaderSource(shaderObject, 1, source, null);
+    writeln("Source:");
+    writeln(source);
+
+    char* sourceCodePtr = source.ptr;
+
+	glShaderSource(shaderObject, 1, &sourceCodePtr, null);
 	// Now compile our shader
 	glCompileShader(shaderObject);
 
@@ -139,26 +130,25 @@ GLuint CompileShader(GLuint type, const(char*)* source){
 
 		return 0;
 	}
-  return shaderObject;
+
+    return shaderObject;
 }
 
 
 
 /**
 * Creates a graphics program object (i.e. graphics pipeline) with a Vertex Shader and a Fragment Shader
-*
-* @param vertexShaderSource Vertex source code as a string
-* @param fragmentShaderSource Fragment shader source code as a string
-* @return id of the program Object
 */
-GLuint CreateShaderProgram(const(char*)[] vertexShaderSource, const(char*)[] fragmentShaderSource){
+GLuint CreateShaderProgram(char[] vertexShaderSource, char[] fragmentShaderSource){
 
     // Create a new program object
     GLuint programObject = glCreateProgram();
 
     // Compile our shaders
-    GLuint myVertexShader   = CompileShader(GL_VERTEX_SHADER, vertexShaderSource.ptr);
-    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource.ptr);
+    GLuint myVertexShader   = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
+    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+
 
     // Link our two shader programs together.
 	// Consider this the equivalent of taking two .cpp files, and linking them into
@@ -189,12 +179,18 @@ GLuint CreateShaderProgram(const(char*)[] vertexShaderSource, const(char*)[] fra
 */
 void CreateGraphicsPipeline(){
 
-    const(char*)[] vertexShaderSource      = LoadShaderAsStrings("./shaders/vert.glsl");
-    const(char*)[] fragmentShaderSource    = LoadShaderAsStrings("./shaders/frag.glsl");
+    char[] vertexShaderSource      = LoadShaderAsString("./shaders/vert.glsl");
+    char[] fragmentShaderSource    = LoadShaderAsString("./shaders/frag.glsl");
 
 	g.graphicsPipelineShaderProgram = CreateShaderProgram(vertexShaderSource,fragmentShaderSource);
 }
 
+void Initialize(){
+    // Initialize glfw
+    if(!glfwInit()){
+        writeln("glfw failed to initialize");
+    }
+}
 
 void VertexSpecification(){
 
@@ -246,7 +242,7 @@ void PreDraw(){
     // Initialize clear color
     // This is the background of the screen.
     glViewport(0, 0, g.screenWidth, g.screenHeight);
-    glClearColor( 1.0f, 1.0f, 0.0f, 1.0f );
+    glClearColor( 0.0f, 0.7f, 0.7f, 1.0f );
 
     //Clear color buffer and Depth Buffer
   	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -259,11 +255,6 @@ void PreDraw(){
 
 /**
 * Draw
-* The render function gets called once per loop.
-* Typically this includes 'glDraw' related calls, and the relevant setup of buffers
-* for those calls.
-*
-* @return void
 */
 void Draw(){
     // Enable our attributes
@@ -331,10 +322,8 @@ void loop(){
 /// NOTE: When debugging, this is '_Dmain'
 void main(string[] args){
 
-    // Initialize glfw
-    if(!glfwInit()){
-        writeln("glfw failed to initialize");
-    }
+
+    Initialize();
 
     loop();
 
