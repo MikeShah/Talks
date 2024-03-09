@@ -94,7 +94,6 @@ void glInformation(){
 
 void loop(){
 
-
     while(!glfwWindowShouldClose(g.window)){
         glfwPollEvents();
 
