@@ -1,188 +1,30 @@
 // Hello world
 // dmd deferred.d -L-L/usr/local/lib -L-lglfw3 -of=prog
+// dmd glfw.d deferred.d shader.d -L-L/usr/local/lib -L-lglfw3 -of=prog
 import std.stdio;
 import glad.gl.all;
 import glad.gl.loader;
 
-// ---------------------------------------------------------------------------
-/// GLFW Bindings
-/// When we link in the library, we need to have what you'd think of as the header
-/// available here.
-extern(C){
-    // Forward declare structures
-    struct GLFWmonitor;
-    struct GLFWwindow;
-
-    enum{ GLFW_CONTEXT_VERSION_MAJOR = 0x00022002,
-          GLFW_CONTEXT_VERSION_MINOR = 0x00022003,
-          GLFW_OPENGL_PROFILE =  0x00022008,
-          GLFW_OPENGL_CORE_PROFILE  = 0x00032001,
-          GLFW_OPENGL_FORWARD_COMPAT =  0x00022006,
-    }
-
-    // Types
-    alias GLFWglproc = void* function(const char*);
-
-    // Functions
-    int glfwInit();
-    GLFWwindow* glfwCreateWindow(int,int,const char*, GLFWmonitor*, GLFWwindow*);
-    void glfwDestroyWindow (GLFWwindow *window);
-    void glfwTerminate();
-    int  glfwWindowShouldClose (GLFWwindow *window);
-    void glfwPollEvents ();
-    int  glfwWindowShouldClose(GLFWwindow *    window);
-    void glfwSwapBuffers (GLFWwindow *window);
-    void glfwMakeContextCurrent (GLFWwindow *window);
-    void glfwWindowHint (int hint, int value);
-
-    GLFWglproc  glfwGetProcAddress (const char *procname);
-}
-// ---------------------------------------------------------------------------
-
+import shader;
+import glfw;
+import object3d;
 
 Globals g;
+
 /// Safer way to work with global state
 /// module constructors
 shared static this(){
+    g.basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
+    g.obj = Object3D();
 }
 
 
 
 struct Globals{
-    GLuint graphicsPipelineShaderProgram = 0;
-    GLuint vertexArrayObject		     = 0;
-    GLuint vertexBufferObject			 = 0;
-    int screenWidth 						= 640;
-    int screenHeight 						= 480;
-}
-
-
-/**
-  appender allows for more efficient allocations
-*/
-char[] LoadShaderAsString(string filename){
-    import std.file;
-    import std.stdio;
-
-    if(exists(filename)){
-        auto file = File(filename);
-
-
-        writeln(file.size);
-        char[] bytes = new char[file.size];
-        file.rawRead(bytes);
-
-        writeln("bytes:",bytes);
-
-        return bytes;
-    }
-    return null;
-}
-
-
-/**
-* CompileShader will compile any valid vertex, fragment, geometry, tesselation, or compute shader.
-*/
-GLuint CompileShader(GLuint type, char[] source){
-    import std.string;
-
-	// Compile our shaders
-	GLuint shaderObject;
-
-	// Based on the type passed in, we create a shader object specifically for that
-	// type.
-	if(type == GL_VERTEX_SHADER){
-		shaderObject = glCreateShader(GL_VERTEX_SHADER);
-	}else if(type == GL_FRAGMENT_SHADER){
-		shaderObject = glCreateShader(GL_FRAGMENT_SHADER);
-	}
-
-	// The source of our shader
-    writeln("Source:");
-    writeln(source);
-
-    char* sourceCodePtr = source.ptr;
-
-	glShaderSource(shaderObject, 1, &sourceCodePtr, null);
-	// Now compile our shader
-	glCompileShader(shaderObject);
-
-	// Retrieve the result of our compilation
-	int result;
-	// Our goal with glGetShaderiv is to retrieve the compilation status
-	glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &result);
-
-	if(result == GL_FALSE){
-		int length;
-		glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &length);
-		GLchar[] errorMessages = new GLchar[length];
-        writeln("failed: ",length);
-		glGetShaderInfoLog(shaderObject, length, &length, errorMessages.ptr);
-
-		if(type == GL_VERTEX_SHADER){
-			writeln("ERROR: GL_VERTEX_SHADER compilation failed!\n", errorMessages, "\n");
-		}else if(type == GL_FRAGMENT_SHADER){
-			writeln("ERROR: GL_FRAGMENT_SHADER compilation failed!\n", errorMessages, "\n");
-		}
-
-		// Delete our broken shader
-		glDeleteShader(shaderObject);
-
-		return 0;
-	}
-
-    return shaderObject;
-}
-
-
-
-/**
-* Creates a graphics program object (i.e. graphics pipeline) with a Vertex Shader and a Fragment Shader
-*/
-GLuint CreateShaderProgram(char[] vertexShaderSource, char[] fragmentShaderSource){
-
-    // Create a new program object
-    GLuint programObject = glCreateProgram();
-
-    // Compile our shaders
-    GLuint myVertexShader   = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
-    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-
-
-
-    // Link our two shader programs together.
-	// Consider this the equivalent of taking two .cpp files, and linking them into
-	// one executable file.
-    glAttachShader(programObject,myVertexShader);
-    glAttachShader(programObject,myFragmentShader);
-    glLinkProgram(programObject);
-
-    // Validate our program
-    glValidateProgram(programObject);
-
-    // Once our final program Object has been created, we can
-	// detach and then delete our individual shaders.
-    glDetachShader(programObject,myVertexShader);
-    glDetachShader(programObject,myFragmentShader);
-	// Delete the individual shaders once we are done
-    glDeleteShader(myVertexShader);
-    glDeleteShader(myFragmentShader);
-
-    return programObject;
-}
-
-
-/**
-* Create the graphics pipeline
-*
-* @return void
-*/
-void CreateGraphicsPipeline(){
-
-    char[] vertexShaderSource      = LoadShaderAsString("./shaders/vert.glsl");
-    char[] fragmentShaderSource    = LoadShaderAsString("./shaders/frag.glsl");
-
-	g.graphicsPipelineShaderProgram = CreateShaderProgram(vertexShaderSource,fragmentShaderSource);
+    Shader basicShader;
+    Object3D obj;
+    int screenWidth = 640;
+    int screenHeight = 480;
 }
 
 void Initialize(){
@@ -191,48 +33,6 @@ void Initialize(){
         writeln("glfw failed to initialize");
     }
 }
-
-void VertexSpecification(){
-
-	// Geometry Data
-	const GLfloat[] vertexData =
-    [
-	   -0.5f,  -0.5f, 0.0f, 	// Left vertex position
-		1.0f,   0.0f, 0.0f, 	// color
-		0.5f,  -0.5f, 0.0f,  	// right vertex position
-		0.0f,   1.0f, 0.0f,  	// color
-		0.0f,   0.5f, 0.0f,  	// Top vertex position
-		0.0f,   0.0f, 1.0f,  	// color
-    ];
-
-
-	// Vertex Arrays Object (VAO) Setup
-	glGenVertexArrays(1, &g.vertexArrayObject);
-	// We bind (i.e. select) to the Vertex Array Object (VAO) that we want to work withn.
-	glBindVertexArray(g.vertexArrayObject);
-
-	// Vertex Buffer Object (VBO) creation
-	glGenBuffers(1, &g.vertexBufferObject);
-	glBindBuffer(GL_ARRAY_BUFFER, g.vertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, vertexData.length* GLfloat.sizeof, vertexData.ptr, GL_STATIC_DRAW);
-
-    pragma(msg,vertexData.length);
-
-    // Vertex attributes
-	glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLfloat.sizeof*6, cast(void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, GLfloat.sizeof*6, cast(GLvoid*)(GLfloat.sizeof*3));
-
-	// Unbind our currently bound Vertex Array Object
-	glBindVertexArray(0);
-	// Disable any attributes we opened in our Vertex Attribute Arrray,
-	// as we do not want to leave them open. 
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-}
-
 
 void PreDraw(){
 	// Disable depth test and face culling.
@@ -246,28 +46,19 @@ void PreDraw(){
 
     //Clear color buffer and Depth Buffer
   	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-    // Use our shader
-	glUseProgram(g.graphicsPipelineShaderProgram);
 }
-
-
 
 /**
 * Draw
 */
 void Draw(){
-    // Enable our attributes
-	glBindVertexArray(g.vertexArrayObject);
+    // Select a shader
+    g.basicShader.Use();
+    
+    // Draw object
+    g.obj.Draw();
 
-	// Select the vertex buffer object we want to enable
-    glBindBuffer(GL_ARRAY_BUFFER, g.vertexBufferObject);
-
-    //Render data
-    glDrawArrays(GL_TRIANGLES,0,3);
-
-	// Stop using our current graphics pipeline
-	// Note: This is not necessary if we only have one graphics pipeline.
+    // Bind to 'no shader'
     glUseProgram(0);
 }
 
@@ -301,8 +92,6 @@ void loop(){
 
     glInformation();
 
-    VertexSpecification();
-    CreateGraphicsPipeline();
 
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
