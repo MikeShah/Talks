@@ -1,3 +1,5 @@
+module object3d;
+
 import std.stdio;
 import glad.gl.all;
 import glad.gl.loader;
@@ -8,7 +10,7 @@ struct Object3D{
     GLuint vertexArrayObject = 0;
     GLuint vertexBufferObject = 0;
 
-    this( int id){
+    this(string name){
         // Geometry Data
         const GLfloat[] vertexData =
             [
@@ -27,7 +29,7 @@ struct Object3D{
 
         // Vertex Buffer Object (VBO) creation
         glGenBuffers(1, &vertexBufferObject);
-        glBindBuffer(GL_ARRAY_BUFFER, g.vertexBufferObject);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
         glBufferData(GL_ARRAY_BUFFER, vertexData.length* GLfloat.sizeof, vertexData.ptr, GL_STATIC_DRAW);
 
         pragma(msg,vertexData.length);

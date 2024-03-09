@@ -1,5 +1,8 @@
+module shader;
+
 import std.stdio;
 import glad.gl.all;
+import glad.gl.loader;
 
 struct Shader{
 
@@ -11,8 +14,6 @@ struct Shader{
      */
     this(string vertexShaderFile, string fragmentShaderFile){
 
-        //char[] vertexShaderSource      = LoadShaderAsString("./shaders/vert.glsl");
-        //char[] fragmentShaderSource    = LoadShaderAsString("./shaders/frag.glsl");
         char[] vertexShaderSource      = LoadShaderAsString(vertexShaderFile);
         char[] fragmentShaderSource    = LoadShaderAsString(fragmentShaderFile);
 
@@ -147,6 +148,9 @@ struct Shader{
 	}
 }
 
+
+
+/*
 	string generateUniform(string Name, params...)(){
 		import std.meta;
 		if(__ctfe){
@@ -164,3 +168,4 @@ struct Shader{
 	}
 
 	mixin(generateUniform!("glGet","int m1")());
+*/

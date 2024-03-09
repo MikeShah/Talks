@@ -1,12 +1,12 @@
+module deferred;
 // Hello world
-// dmd deferred.d -L-L/usr/local/lib -L-lglfw3 -of=prog
-// dmd glfw.d deferred.d shader.d -L-L/usr/local/lib -L-lglfw3 -of=prog
+// dmd glfw.d deferred.d shader.d object3d.d ./glad/gl/*.d -L-L/usr/local/lib -L-lglfw3 -of=prog
 import std.stdio;
 import glad.gl.all;
 import glad.gl.loader;
 
-import shader;
 import glfw;
+import shader;
 import object3d;
 
 Globals g;
@@ -14,8 +14,6 @@ Globals g;
 /// Safer way to work with global state
 /// module constructors
 shared static this(){
-    g.basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
-    g.obj = Object3D();
 }
 
 
@@ -23,6 +21,7 @@ shared static this(){
 struct Globals{
     Shader basicShader;
     Object3D obj;
+    GLFWwindow* window;
     int screenWidth = 640;
     int screenHeight = 480;
 }
@@ -32,6 +31,24 @@ void Initialize(){
     if(!glfwInit()){
         writeln("glfw failed to initialize");
     }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
+
+    g.window = glfwCreateWindow(g.screenWidth,g.screenHeight,"DConf Online 2024",null,null);
+    glfwMakeContextCurrent(g.window);
+
+    // Setup extensions
+    if(!glad.gl.loader.gladLoadGL()){    
+        writeln("Some error: Did you create a window and context first?");
+        return;
+    }
+
+    glInformation();
+
+    g.basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
+    g.obj = Object3D("object name");
 }
 
 void PreDraw(){
@@ -76,34 +93,19 @@ void glInformation(){
 
 
 void loop(){
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
-
-    GLFWwindow* window = glfwCreateWindow(g.screenWidth,g.screenHeight,"DConf Online 2024",null,null);
-    glfwMakeContextCurrent(window);
-
-    // Setup extensions
-    if(!glad.gl.loader.gladLoadGL()){    
-        writeln("Some error: Did you create a window and context first?");
-        return;
-    }
-
-    glInformation();
 
 
-    while(!glfwWindowShouldClose(window)){
+    while(!glfwWindowShouldClose(g.window)){
         glfwPollEvents();
 
         // Do opengl stuff
         PreDraw();
         Draw();
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(g.window);
     }
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(g.window);
 }
 
 
