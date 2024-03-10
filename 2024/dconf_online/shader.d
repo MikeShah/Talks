@@ -1,6 +1,7 @@
 module shader;
 
 import std.stdio;
+import std.conv;
 import glad.gl.all;
 import glad.gl.loader;
 
@@ -137,13 +138,25 @@ struct Shader{
         return programObject;
     }
 
-	void UniformMatrix4fv(const char* symbol, GLfloat* value){	
+	void SetInt(const char* symbol, GLuint value){	
+		GLint location = glGetUniformLocation(handle,symbol);
+
+		if(location >=0){
+			glUniform1i(location,value);
+		}else{
+			writeln("Could not find ",symbol.to!string,", maybe a mispelling or symbol was not used in shader\n");
+            import core.stdc.stdlib;
+            exit(1);
+		}
+	}
+
+	void SetMat4x4(const char* symbol, GLfloat* value){	
 		GLint location = glGetUniformLocation(handle,symbol);
 
 		if(location >=0){
 			glUniformMatrix4fv(location,1,GL_FALSE,value);
 		}else{
-			writeln("Could not find ",symbol,", maybe a mispelling or symbol was not used in shader\n");
+			writeln("Could not find ",symbol.to!string,", maybe a mispelling or symbol was not used in shader\n");
 		}
 	}
 }

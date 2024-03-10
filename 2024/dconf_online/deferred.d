@@ -1,6 +1,6 @@
 module deferred;
 // Hello world
-// dmd glfw.d deferred.d shader.d object3d.d ./glad/gl/*.d -L-L/usr/local/lib -L-lglfw3 -of=prog
+// dmd glfw.d deferred.d shader.d triangleOBJect3d.d ./glad/gl/*.d -L-L/usr/local/lib -L-lglfw3 -of=prog
 import std.stdio;
 import glad.gl.all;
 import glad.gl.loader;
@@ -8,29 +8,32 @@ import glad.gl.loader;
 import glfw;
 import shader;
 import object3d;
+import rendertarget;
 
 Globals g;
 
-/// Safer way to work with global state
-/// module constructors
-shared static this(){
-}
-
-
-
 struct Globals{
+
     Shader basicShader;
-    Object3D obj;
+    Shader renderTargetShader;
+    Object3D triangleOBJ;
+	Object3D screenQuad;
+
+	RenderTarget renderTarget;
+
     GLFWwindow* window;
     int screenWidth = 640;
     int screenHeight = 480;
 }
 
-void Initialize(){
+/// Safer way to work with global state
+/// module constructors
+shared static this(){
     // Initialize glfw
     if(!glfwInit()){
         writeln("glfw failed to initialize");
     }
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
@@ -47,11 +50,23 @@ void Initialize(){
 
     glInformation();
 
+	// Initialize our own frame buffer
+	g.renderTarget = RenderTarget(g.screenWidth, g.screenHeight);
+
     g.basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
-    g.obj = Object3D("object name");
+    g.triangleOBJ = Object3D("triangleOBJect name");
+	g.triangleOBJ.Triangle();
+
+    g.renderTargetShader = Shader("./shaders/renderTargetVert.glsl","./shaders/renderTargetFrag.glsl");
+    g.screenQuad= Object3D("screen quad name");
+	g.screenQuad.ScreenQuad();
 }
 
-void PreDraw(){
+
+/**
+* Draw
+*/
+void Draw(){
 	// Disable depth test and face culling.
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -63,17 +78,23 @@ void PreDraw(){
 
     //Clear color buffer and Depth Buffer
   	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-}
 
-/**
-* Draw
-*/
-void Draw(){
+	// Bind to the target that we want to draw to
+	g.renderTarget.Bind();
+	// Render as normal
     // Select a shader
     g.basicShader.Use();
-    
-    // Draw object
-    g.obj.Draw();
+    // Draw triangleOBJect
+    g.triangleOBJ.Draw(3);
+
+
+	// Bind to a 'default' render target
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+	// Draw our sceene to the target
+    g.renderTargetShader.Use();
+	g.renderTargetShader.SetInt("screenTexture",0);
+	// Draw a simple screen quad
+	g.screenQuad.Draw(6);;
 
     // Bind to 'no shader'
     glUseProgram(0);
@@ -98,7 +119,6 @@ void loop(){
         glfwPollEvents();
 
         // Do opengl stuff
-        PreDraw();
         Draw();
 
         glfwSwapBuffers(g.window);
@@ -112,8 +132,6 @@ void loop(){
 /// NOTE: When debugging, this is '_Dmain'
 void main(string[] args){
 
-
-    Initialize();
 
     loop();
 
