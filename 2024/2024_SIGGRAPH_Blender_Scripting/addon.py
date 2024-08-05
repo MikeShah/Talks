@@ -1,6 +1,6 @@
 
 bl_info = {
-    "name": "Compute Bounding Box BCon",
+    "name": "Compute Bounding Box SIGGRAPH",
     "blender": (3, 00, 0),
     "category": "Object",
 }
@@ -15,7 +15,7 @@ import time # Used for time keeping
 class ObjectComputeBoundingBox(bpy.types.Operator):
     """Simple example showing you how to compute bounding box""" # Use this as a tooltip for menu items and buttons.
     bl_idname = "object.computebunding_box"             # Unique identifier for buttons and menu items to reference.
-    bl_label = "Compute Bounding Box BCon"                       # Display name in the interface.
+    bl_label = "Compute Bounding Box SIGGRAPH"                       # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
 
     def execute(self, context):        # execute() is called when running the operator.
