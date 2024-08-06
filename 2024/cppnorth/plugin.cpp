@@ -60,6 +60,7 @@ extern "C" int Plugin_Registry()
 		return 0; 
 }
 
+// Entry point of program
 int main(){
 
 		return 0;

@@ -6,7 +6,6 @@
 // Run:     ./ascii23 ascii23.cpp
 // Run with gdb: gdb ./ascii23 --tui
 
-
 #include <iostream>     // For general I/O
 #include <string>       // std::string data type
 #include <vector>       // std::vector data type
@@ -97,14 +96,13 @@ std::vector<uint8_t> ConvertPixelsToGray(std::span<uint8_t> pixels){
     std::vector<size_t> indexes(WIDTH*HEIGHT);
     std::iota(indexes.begin(),indexes.end(),0);
 
-    std::for_each(indexes.begin(),indexes.end(),[&](int idx){
+    std::for_each(std::execution::par,indexes.begin(),indexes.end(),[&](int idx){
         float r = (float)pixels[3*idx+0]*0.21;
         float g = (float)pixels[3*idx+1]*0.72;
         float b = (float)pixels[3*idx+2]*0.07;
         float avg = (float)(r+g+b)/3.0;
         result[idx] = avg;
     });
-
 
     return result;
 }
