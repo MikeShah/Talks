@@ -1,9 +1,9 @@
-// @file: wc23.cpp
+// @file: wc23_1.cpp
 // @description: The purpose of this file is to read the
 //               number of words in a file.
 
-// Compile: g++ -g -Wall -std=c++23 wc23.cpp -o wc23
-// Run:     ./wc23 wc23.cpp
+// Compile: g++ -g -Wall -std=c++23 wc23_1.cpp -o wc23_1
+// Run:     ./wc23_1 wc23_1.cpp
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,43 +11,36 @@
 #include <filesystem>
 #include <print>
 
-struct wcInfo{
-    size_t lines{0};
-    size_t words{0};
-    size_t bytes{0};
-};
-
-/// Main function for retrieving the file size 
-wcInfo wc(const char* filename){
-    wcInfo result{};     
+std::tuple<size_t,size_t,size_t> wc(const char* filename){
+    size_t lines{};
+    size_t words{};
+    size_t bytes{};
     // Open file for input
     std::ifstream myFile(filename,std::ios::in);
     
     // Helper lambda function for counting words in line
-    auto wordsInLine = [](auto line){
-            size_t count{};
+    auto wordsInLine = [lines](auto line){
             std::stringstream s(line);
             std::string word{};
             while(s >> word){
-                ++count;
+                ++lines;
             }
-            return count;
     };
 
     // Iterate through each line and each word
     // using stringstream to parse 'whitespace'
     if(myFile.is_open()){
-        result.bytes = std::filesystem::file_size(filename);
+        bytes = std::filesystem::file_size(filename);
         std::string line{};
         while(std::getline(myFile,line)){
-            ++result.lines;
-            result.words += wordsInLine(line);
+            ++lines;
+            words += wordsInLine(line);
         }
     }else{
         std::cerr << "File could not be read: " << filename << std::endl;
     }
 
-    return result; 
+    return std::make_tuple<size_t,size_t,size_t>(lines,words,bytes); 
 }
 
 /// Program entry point
