@@ -4,7 +4,7 @@
 
 // Compile: g++ -g -Wall -std=c++98 ascii98.cpp -o ascii98
 // Run:     ./ascii98 ascii98.cpp
-// Run with gdb: gdb ./prog --tui
+// Run with gdb: gdb ./asci98 --tui
 
 
 #include <iostream>     // For general I/O
@@ -88,7 +88,7 @@ std::vector<unsigned char> ConvertPixelsToGray(const std::vector<unsigned char>&
     std::vector<unsigned char> result;
 
     for(int i=0; i < WIDTH*HEIGHT*CHANNELS; i+=CHANNELS){
-        float r = (float)pixels[i]*0.21;
+        float r = (float)pixels[i+0]*0.21;
         float g = (float)pixels[i+1]*0.72;
         float b = (float)pixels[i+2]*0.07;
 

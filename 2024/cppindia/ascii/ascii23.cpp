@@ -2,9 +2,9 @@
 // @description: The purpose of this file is to convert an image to an
 //               ascii rendering on the terminal.
 
-// Compile: g++ -g -Wall -std=c++98 ascii98.cpp -o ascii98
-// Run:     ./ascii98 ascii98.cpp
-// Run with gdb: gdb ./prog --tui
+// Compile: g++ -g -Wall -std=c++23 ascii23.cpp -o ascii23
+// Run:     ./ascii23 ascii23.cpp
+// Run with gdb: gdb ./ascii23 --tui
 
 
 #include <iostream>     // For general I/O
@@ -90,18 +90,21 @@ std::vector<uint8_t> LoadPPMImage(const std::string filename){
  * G G G
  */
 std::vector<uint8_t> ConvertPixelsToGray(std::span<uint8_t> pixels){
+    // Preallocate array
     std::vector<uint8_t> result(WIDTH*HEIGHT);
     result.reserve(WIDTH*HEIGHT);
     // Populate with values 0 to the size 
-    std::iota(result.begin(),result.end(),1);
+    std::vector<size_t> indexes(WIDTH*HEIGHT);
+    std::iota(indexes.begin(),indexes.end(),0);
 
-    std::for_each(result.begin(),result.end(),[&](auto idx){
-        float r = (float)pixels[3*idx]*0.21;
+    std::for_each(indexes.begin(),indexes.end(),[&](int idx){
+        float r = (float)pixels[3*idx+0]*0.21;
         float g = (float)pixels[3*idx+1]*0.72;
         float b = (float)pixels[3*idx+2]*0.07;
         float avg = (float)(r+g+b)/3.0;
         result[idx] = avg;
     });
+
 
     return result;
 }
