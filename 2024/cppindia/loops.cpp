@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <ranges>
+#include <algorithm>
 
 int main(){
 	std::vector c{1,2,3,4,5};
@@ -35,8 +36,8 @@ int main(){
 
 	// Range(s) views
 	std::cout << "ranges view" << std::endl;
-	for(auto elem: std::views::all(c)){
-		std::cout << elem << std::endl;
+	for(const auto& e: std::views::all(c)){
+		std::cout << e << std::endl;
 	}
 
 }
