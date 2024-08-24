@@ -22,19 +22,19 @@ int main(){
      }
  
      // Iterators also will give us access to std::algorithm
+     // std::for_each available since at least c++98.
      std::cout << "std::algorithm Loop" << std::endl;
      std::for_each(c.begin(),c.end(),[](auto &e){
              std::cout << e << std::endl;
      });
  
-     // We need to implement iterators however
-     // in order to use range-based loops
+     // C++11 provides 'ranged-for' loop
      std::cout << "ranged-for Loop" << std::endl;
      for(const auto& e : c){
          std::cout << e << std::endl;
      }
 
-	// Range(s) views
+	// Range(s) views provided in C++20
 	std::cout << "ranges view" << std::endl;
 	for(const auto& e: std::views::all(c)){
 		std::cout << e << std::endl;
