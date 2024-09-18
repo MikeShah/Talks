@@ -11,6 +11,7 @@ import std.string;
 
 import texture;
 import material;
+import linearalgebra;
 
 // Vertex Structures for format 
 struct Format3v3n{
@@ -32,6 +33,28 @@ struct Format3v3n2t{
 }
 
 
+struct Transformation{
+		mat4!float mMatrix;
+
+		@disable this();
+
+		this(int i){
+				SetDefault();
+		}
+
+		void SetDefault(){
+				mMatrix.makeIdentity!float();
+		}
+
+		mat4!float GetTransform(){
+				return mMatrix;
+		}
+		float[] GetTransformFlattened(){
+				return mMatrix.flatten!float;
+		}
+}
+
+
 /// 3D Objects
 struct Object3D{
 		string mName;
@@ -41,9 +64,21 @@ struct Object3D{
 		int mVertices = 0;
 		Texture mTexture;
 		Material[] mMaterials;
+		Transformation mTransform;
+
+		void Translate(float x, float y, float z){
+				mTransform.mMatrix = MakeTranslationMatrix(vec3!float(x,y,z));	
+		}
+		float* GetModelMatrixPtr(){
+				auto result= mTransform.GetTransformFlattened.ptr;
+
+				return result;	
+		}
 
 		this(string name){
 				this.mName = name;
+				mTransform = Transformation(1);
+				mTransform.SetDefault();
 		}
 
 		void Triangle(){
@@ -96,26 +131,26 @@ struct Object3D{
 				foreach(line ; f.byLine){
 						if(line.startsWith("v ")){
 								line.splitter(" ").array.remove(0).strip("").each!((e) { 
-									 if(e!= "" || e!= " " || e!="  "){	
-										vertices~= parse!float(e);
-									}
-								});
+												if(e!= "" || e!= " " || e!="  "){	
+												vertices~= parse!float(e);
+												}
+												});
 								//                writeln(line.splitter(" ").array);
 						}
 						else if(line.startsWith("vn ")){
 								line.splitter(" ").array.remove(0).strip("").each!((e) { 
-									 if(e!= "" || e!= " " || e!="  "){	
-										normals ~= parse!float(e);
-										}
-								});
+												if(e!= "" || e!= " " || e!="  "){	
+												normals ~= parse!float(e);
+												}
+												});
 								//                writeln(line.splitter(" ").array);
 						}
 						else if(line.startsWith("vt ")){
 								line.splitter(" ").array.remove(0).strip("").each!((e) {
-									 if(e!= "" || e!= " " || e!="  "){	
-									 	texture_coords ~= parse!float(e);
-									 }
-								});
+												if(e!= "" || e!= " " || e!="  "){	
+												texture_coords ~= parse!float(e);
+												}
+												});
 								//                writeln(line.splitter(" ").array);
 						}
 						else if(line.startsWith("f ")){
@@ -155,19 +190,19 @@ struct Object3D{
 				auto f = File(filepath);
 
 				foreach(line ; f.byLine){
-					if(line.indexOf("newmtl")>=0){
-						writeln("Adding material",line.strip);
-						mMaterials ~= Material(line.strip.to!string);
-					}	
-					
-					if(line.indexOf(".ppm")>=0 || line.indexOf(".PPM")>=0){
-						auto tokens = line.splitter(" ").array;
-						if(tokens[0] == "map_Kd"){
-							mMaterials[$-1].mDiffuseImage.LoadPPM(path ~ tokens[1].to!string);
+						if(line.indexOf("newmtl")>=0){
+								writeln("Adding material",line.strip);
+								mMaterials ~= Material(line.strip.to!string);
+						}	
+
+						if(line.indexOf(".ppm")>=0 || line.indexOf(".PPM")>=0){
+								auto tokens = line.splitter(" ").array;
+								if(tokens[0] == "map_Kd"){
+										mMaterials[$-1].mDiffuseImage.LoadPPM(path ~ tokens[1].to!string);
+								}
 						}
-					}
 				}
-			
+
 		}
 
 

@@ -48,11 +48,15 @@ struct GraphicsApplication{
 				// Setup extensions
 				if(!glad.gl.loader.gladLoadGL()){    
 						writeln("Some error: Did you create a window and context first?");
-						return;
+						import core.stdc.stdlib;
+						exit(1);
 				}
 
 				// Retrieve information about OpenGL
 				glInformation();
+
+				// Setup our camera
+				camera = Camera(0);
 
 				// Initialize our own frame buffer
 				mRenderTarget = RenderTarget(mScreenWidth, mScreenHeight);
@@ -86,10 +90,15 @@ struct GraphicsApplication{
 
 		// Handle input
 		void Input(){
-			static int x=0;
-			++x;
-			camera.MouseLook(x,0);
-			writeln(camera.GetViewMatrix());
+				static int x=0;
+				++x;
+				writeln(__FILE__,":",__LINE__,"-",camera.GetViewMatrix());
+				if(x%2==0){
+						camera.MouseLook(53,52);
+				}else{
+						camera.MouseLook(51,53);
+				}
+				writeln(__FILE__,":",__LINE__,"-",camera.GetViewMatrix());
 		}
 
 		void Update(){
@@ -118,10 +127,25 @@ struct GraphicsApplication{
 				//g.triangleOBJ.Draw();
 
 				// Draw obj object
+
 				objShader.Use();
+				static float z=-8.0001f;
+//				z-=0.01f;
+				objOBJ.Translate(0.0f,0.0f,-z);
+				camera.MoveForward(0.1f);
+
+				objShader.SetMat4x4("uModel", objOBJ.GetModelMatrixPtr()); 
+				objShader.SetMat4x4("uView", camera.GetViewMatrix().flatten!float().ptr); 
+				objShader.SetMat4x4("uProjection", camera.GetPerspectiveMatrix(90.0f,800.0f/600.0f,0.1f,100.0f).flatten!float().ptr); 
+
 				objOBJ.Draw();
 
-				sponzaOBJ.Draw();
+//				sponzaOBJ.Translate(0.0f,0.0f,z);
+//				objShader.SetMat4x4("uModel", objOBJ.GetModelMatrixPtr()); 
+//				objShader.SetMat4x4("uView", camera.GetViewMatrix().flatten!float().ptr); 
+//				static fov= 45.0f;
+//				objShader.SetMat4x4("uProjection", camera.GetPerspectiveMatrix(fov,800.0f/600.0f,0.1f,1000.0f).flatten!float().ptr); 
+//				sponzaOBJ.Draw();
 
 				// Bind to a 'default' render target
 				glBindFramebuffer(GL_FRAMEBUFFER,0);
@@ -141,6 +165,7 @@ struct GraphicsApplication{
 				Update();
 				// Do opengl stuff
 				Render();
+
 		}
 
 		void RunLoop(){
@@ -149,9 +174,12 @@ struct GraphicsApplication{
 						glfwPollEvents();
 
 						AdvanceFrame();	
+						//				import core.stdc.stdlib;
+						//			exit(1);
 
 						// Double Buffering
 						glfwSwapBuffers(mWindow);
+
 				}
 
 		}
