@@ -24,7 +24,7 @@ struct Camera{
 		@disable this();
 
 		this(int id){
-				writeln("(Constructor) Created a Camera!");
+//				writeln("(Constructor) Created a Camera!");
 				// Position us at the origin.
 				mEyePosition = vec3(-7.0, 2.5f, 0.05f);
 				// Looking down along the z-axis initially.
@@ -36,7 +36,7 @@ struct Camera{
 
 				mProjection = mat4.perspective(4.0f,3.0f,45.0f,0.1f,100.0f);
 
-				writeln("Projection:\n\t",mProjection);
+//				writeln("Projection:\n\t",mProjection);
 				import core.stdc.stdlib;
 //				exit(1);
 		}
@@ -51,7 +51,7 @@ struct Camera{
 				// Detect how much the mouse has moved since
 				// the last time
 				auto mouseDelta =  mOldMousePosition-newMousePosition;
-				writeln("mouseDelta",mouseDelta);
+//				writeln("mouseDelta",mouseDelta);
 
 				mat3 temp;	
 				vec3 test= temp.rotation(radians(-mouseDelta.x), mUpVector)* mViewDirection * 0.01f;
@@ -131,16 +131,16 @@ struct Camera{
 		mat4 GetViewMatrix() {
 				// Think about the second argument and why that is
 				// setup as it is.
-				writeln("============");
-				writeln("eye:",mEyePosition);
-				writeln("viewDir:",mViewDirection);
+//				writeln("============");
+//				writeln("eye:",mEyePosition);
+//				writeln("viewDir:",mViewDirection);
 				vec3 target = mEyePosition + mViewDirection;
-				writeln("target:",target);
-				writeln("up:",mUpVector);
-				writeln("lookat:",mat4.lookAt(mEyePosition,
-								mEyePosition + mViewDirection,
-								mUpVector));
-				writeln("============");
+//				writeln("target:",target);
+//				writeln("up:",mUpVector);
+//				writeln("lookat:",mat4.lookAt(mEyePosition,
+//								mEyePosition + mViewDirection,
+//								mUpVector));
+//				writeln("============");
 
 
 

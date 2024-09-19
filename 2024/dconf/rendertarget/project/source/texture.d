@@ -6,6 +6,8 @@
  *  @author Mike
  *  @bug No known bugs.
  */
+import std.stdio;
+
 import bindbc.sdl;
 import bindbc.opengl;
 
@@ -17,7 +19,7 @@ struct Texture{
 		// Filepath to the image loaded
 		string m_filepath;
 		// Store whatever image data inside of our texture class.
-		Image* m_image;
+		Image* mImage;
 		// Default Constructor
 		this(string filepath){
 			LoadTexture(filepath);
@@ -30,14 +32,15 @@ struct Texture{
 		}
 
 		void LoadTexture(const string filepath){
+				writeln("Creating ",filepath," as a texture");
 				// Set member variable
 				m_filepath = filepath;
 				// Load our actual image data
 				// This method loads .ppm files of pixel data
-				m_image = new Image(filepath);
-				m_image.LoadPPM(filepath);
+				mImage = new Image(filepath);
+				mImage.LoadPPM(filepath);
+//				mImage.WriteP3();
 
-				glEnable(GL_TEXTURE_2D); 
 				// Generate a buffer for our texture
 				glGenTextures(1,&m_textureID);
 				// Similar to our vertex buffers, we now 'select'
@@ -52,23 +55,23 @@ struct Texture{
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
 				// Wrap mode describes what to do if we go outside the boundaries of
 				// texture.
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
 				// At this point, we are now ready to load and send some data to OpenGL.
 				glTexImage2D(GL_TEXTURE_2D,
 								0 ,
 								GL_RGB,
-								m_image.GetWidth(),
-								m_image.GetHeight(),
+								mImage.GetWidth(),
+								mImage.GetHeight(),
 								0,
 								GL_RGB,
 								GL_UNSIGNED_BYTE,
-								m_image.GetPixelDataPtr()); // Here is the raw pixel data
+								mImage.GetPixelDataPtr()); // Here is the raw pixel data
 																						 // We are done with our texture data so we can unbind.
 																						 // Generate a mipmap
 				glGenerateMipmap(GL_TEXTURE_2D);                        
 				// We are done with our texture data so we can unbind.    
-				glBindTexture(GL_TEXTURE_2D, 0);
+//				glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 
@@ -81,7 +84,6 @@ struct Texture{
 				// be multiple at once.
 				// At the time of writing, OpenGL supports 8-32 depending
 				// on your hardware.
-				glEnable(GL_TEXTURE_2D);
 				glActiveTexture(GL_TEXTURE0+slot);
 				glBindTexture(GL_TEXTURE_2D, m_textureID);
 		}

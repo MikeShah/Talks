@@ -8,14 +8,19 @@ import bindbc.opengl;
 struct Shader{
 
 		GLuint handle;
+		string vertexShaderPath;
+		string fragmentShaderPath;
 		/**
 		 * Create the graphics pipeline
 		 *
 		 * @return void
 		 */
 		this(string vertexShaderFile, string fragmentShaderFile){
+				vertexShaderPath = vertexShaderFile;
+				fragmentShaderPath = fragmentShaderFile;
 				char[] vertexShaderSource      = LoadShaderAsString(vertexShaderFile);
 				char[] fragmentShaderSource    = LoadShaderAsString(fragmentShaderFile);
+				
 
 				// Duplicate strings so that they do not get accidently destroyed
 				handle = CreateShaderProgram(vertexShaderSource.dup,fragmentShaderSource.dup);
@@ -89,7 +94,11 @@ struct Shader{
 								glGetShaderInfoLog(shaderObject, length, &length, errorMessages.ptr);
 
 								writeln("ERROR: "~to!string(type)~" compilation failed!\n", errorMessages, "\n");
-								writeln("=========failed:",source);
+								if(type==GL_VERTEX_SHADER){
+									writeln("=========failed: vertex shader",vertexShaderPath,"\n",source);
+								}else{
+									writeln("=========failed: fragment shader",fragmentShaderPath,"\n",source);
+								}
 
 								// Delete our broken shader
 								glDeleteShader(shaderObject);
@@ -143,6 +152,10 @@ struct Shader{
 		void SetInt(const char* symbol, GLuint value){	
 				GLint location = GetAndCheckUniformLocation(symbol);
 				glUniform1i(location,value);
+		}
+		void SetVec3(const char* symbol, float x, float y, float z){	
+				GLint location = GetAndCheckUniformLocation(symbol);
+				glUniform3f(location,x,y,z);
 		}
 
 		void SetMat4x4(const char* symbol, const GLfloat* value){	

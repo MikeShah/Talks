@@ -1,12 +1,13 @@
 module object3d;
 
-
+import std.file;
 import std.stdio;
 import std.algorithm;
 import std.array;
 import std.conv;
 import std.ascii;
 import std.string;
+import std.range;
 
 import bindbc.sdl;
 import bindbc.opengl;
@@ -14,6 +15,7 @@ import inmath.linalg;
 
 import texture;
 import material;
+import shader;
 
 // Vertex Structures for format 
 struct Format3v3n{
@@ -37,15 +39,45 @@ struct Format3v3n2t{
 
 // A 3D object may be broken into 'chunks', and thus
 // has its own vertex data.
-struct Chunk(T){
+struct Chunk{
 		int mVertices = 0;
 		GLfloat[] mVertexData;
-		Material mMaterial;
 		GLuint mVAO = 0;
 		GLuint mVBO = 0;
-		Texture mTexture;
-		this(string materialName){
-						
+		Texture* mDiffuseTexture;
+
+		this(string materialName, string materialFilePath){
+				writeln("Creating Chunk: ",materialName);
+				
+				if(exists(materialFilePath)){
+						auto path = materialFilePath.splitter("/").array.dropBackExactly(1).join("/").to!string;
+						path ~="/";
+
+						writeln(path, ": searching");
+						File f = File(materialFilePath);
+						bool foundMatch =false;
+						foreach(line ; f.byLine){
+								if(line.indexOf(materialName)>=0){
+										writeln("Found matching material, now looking for filepaths",line.strip);
+										foundMatch=true;
+								}	
+								if(true==foundMatch){
+										if(line.indexOf(".ppm")>=0 || line.indexOf(".PPM")>=0){
+												writeln("Match for .ppm!!!!!!!!!!!!!!1");
+												auto tokens = line.splitter(" ").array;
+												writeln(tokens);
+												if(tokens[0].indexOf("map_Kd")>=0){
+														writeln("Loading map_kd");
+														if(exists(path~tokens[1].to!string)){
+															mDiffuseTexture = new Texture(path~tokens[1].to!string);;
+														}
+												}
+											break;
+										}
+								}
+						}
+				}
+
 		}
 		// Pass in a struct and we will create the appropriate
 		// model format
@@ -89,11 +121,21 @@ struct Chunk(T){
 						mixin("glDisableVertexAttribArray(",idx,");");
 				}
 				//       pragma(msg,"");
+
+				// Calculate in some way the number of vertices
+				// TODO: Derive this accurately
+				mVertices = cast(int)mVertexData.length/8;
 		}
 
-		void Draw(){
+		void Draw(int slot=0){
 				// Enable our attributes
 				glBindVertexArray(mVAO);
+				if(mDiffuseTexture!=null){
+				mDiffuseTexture.Bind(slot);
+				if(mDiffuseTexture.mImage!=null){
+					//writeln("Drawing texture with dim: ",mDiffuseTexture.mImage.GetWidth());
+				}
+				}
 				//Render data
 				glDrawArrays(GL_TRIANGLES,0, mVertices);
 		}
@@ -103,14 +145,16 @@ struct Chunk(T){
 /// 3D Objects
 struct Object3D{
 		string mName;
+		string mMaterialFilePath;
 		int mTotalVertices = 0;
 		mat4 mModelMatrix;;
 		Chunk[] mChunks;
 
+
 		void Identity(){
-			mModelMatrix = mat4.identity;
+				mModelMatrix = mat4.identity;
 		}
-		
+
 		void Translate(float x, float y, float z){
 				mModelMatrix *= mat4.translation(vec3(x,y,z));
 		}
@@ -128,7 +172,8 @@ struct Object3D{
 
 		void Triangle(){
 				// Geometry Data
-				mVertexData =
+				Chunk newChunk = Chunk("simple","no path");
+				newChunk.mVertexData =
 						[
 						-0.5f,  -0.5f, 0.0f, 	// Left vertex position
 						1.0f,   0.0f, 0.0f, 	// color
@@ -138,12 +183,14 @@ struct Object3D{
 						0.0f,   0.0f, 1.0f,  	// color
 						];
 
-				mVertices = 3;
+				mChunks ~= newChunk;
+				mTotalVertices = 3;
 		}
 
 		void ScreenQuad(){
 				// Geometry Data
-				mVertexData =
+				Chunk newChunk = Chunk("simple","no path");
+				newChunk.mVertexData =
 						[
 						// Triangle 1
 						-1.0f, -1.0f, 0.0f,
@@ -161,11 +208,13 @@ struct Object3D{
 						1.0f, 1.0f,
 						];
 
-				mVertices = 6;
+				mChunks ~= newChunk;
+				mTotalVertices = 6;
 		}
 
 		// One or more objects stored within the single .obj file
-		void LoadGeometry(string filepath){
+		void LoadGeometry(string filepath, string materialFilePath){
+				mMaterialFilePath = materialFilePath;
 				float[] vertices;
 				float[] normals;
 				float[] texture_coords;
@@ -199,9 +248,9 @@ struct Object3D{
 								//                writeln(line.splitter(" ").array);
 						}
 						else if(line.startsWith("usemtl")){
-							auto tokens = line.splitter(" ").array.remove(0).strip("");
-							Chunk newChunk(tokens[1]);
-							mChunks ~= newChunk;
+								auto tokens = line.splitter(" ").array.remove(0);
+								Chunk newChunk = Chunk(tokens[0].to!string,materialFilePath);
+								mChunks ~= newChunk;
 						}
 						else if(line.startsWith("f ")){
 								auto face = line.splitter(" ").array.remove(0).strip("");
@@ -223,36 +272,25 @@ struct Object3D{
 						}
 				}
 
-				mVertices = cast(int)mVertexData.length/8;
-				writeln("flattened data length: ",mVertexData.length);
-				writeln("vertices", mVertices);
+				int sum;
+				foreach(chunk;mChunks){ sum+= chunk.mVertexData.length;}
+				mTotalVertices = sum / 8;
+				//				writeln("flattened data length: ",mVertexData.length);
+				//				writeln("vertices", mVertices);
 				//        writeln(mVertexData);
 		}
 
-		// For now, parses a .mtl file and loads an image per material
-		void LoadMaterial(string filepath){
-				auto filedirectories = filepath.splitter("/").array;
-				auto path = filedirectories[0 .. $-1].join("/") ~ "/";
-				writeln(filedirectories);
-				writeln(path);
 
-				writeln("Preparing to load materials for:",filepath);
-				auto f = File(filepath);
-
-				foreach(line ; f.byLine){
-						if(line.indexOf("newmtl")>=0){
-								writeln("Adding material",line.strip);
-								mMaterials ~= Material(line.strip.to!string);
-						}	
-
-						if(line.indexOf(".ppm")>=0 || line.indexOf(".PPM")>=0){
-								auto tokens = line.splitter(" ").array;
-								if(tokens[0] == "map_Kd"){
-										mMaterials[$-1].mDiffuseImage.LoadPPM(path ~ tokens[1].to!string);
-								}
-						}
+		// Make all of the individual chunks
+		void make(T)(){
+				foreach(ref chunk; mChunks){
+						chunk.make!T();
 				}
-
 		}
-
+		// Iterate through all of the chunks
+		void Draw(){
+				foreach(ref chunk; mChunks){
+						chunk.Draw();
+				}
+		}
 }

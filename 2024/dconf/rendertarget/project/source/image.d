@@ -3,6 +3,7 @@ import std.stdio;
 import std.algorithm;
 import std.array;
 import std.conv;
+import std.string;
 
 struct Image {
 		// Filepath to the image loaded
@@ -13,6 +14,7 @@ struct Image {
 		int mWidth; // Width of the image
 		int mHeight; // Height of the image
 		int mBPP;   // Bits per pixel (i.e. how colorful are our pixels)
+		int maxRange;
 		char[] magicNumber; // magicNumber if any for image format
 												// Constructor for creating an image
 
@@ -26,10 +28,12 @@ struct Image {
 		}
 
 		void LoadPPM(string filepath){
+				writeln("LoadPPM:",filepath);
 				m_filepath = filepath;
 
 				auto f = File(m_filepath);
 
+			import std.file;
 				uint iteration=0;
 				foreach(line ; f.byLine){
 						if(line.startsWith("#")){
@@ -38,27 +42,34 @@ struct Image {
 						if(line[0]=='P'){
 								magicNumber=line;
 								++iteration;
+								continue;
 						}else if(iteration==1){
 								auto tokens =  line.splitter(" ").array;
-								mWidth = to!uint(tokens[0]);
-								mHeight= to!uint(tokens[1]);
+								mWidth = to!int(tokens[0]);
+								mHeight= to!int(tokens[1]);
 								++iteration;
+								continue;
 						}else if(iteration==2){
-								// TODO
-								// store max_range
+								maxRange = line.to!int;
+								++iteration;
+								continue;
 						}else{
-								line.splitter(" ").array;
-								foreach(token ; line){
-										mPixelData ~= cast(ubyte)(token);
+								auto tokens = line.splitter(" ").array;
+								foreach(token ; tokens){
+										if(token!=""){
+											mPixelData ~= token.parse!ubyte;
+										}
 								}
 						}
 				}
 
 				writeln("Image loaded",m_filepath);
+				writeln("\tmaxRange: ",maxRange);
+				writeln("\tdata length: ",mPixelData.length);
 				writeln("\tDimensions:",mWidth,",",mHeight);
+				writeln("\tFirst few bits:",mPixelData[0 ..15]);
 				// Flip all of the pixels
-/*
-				if(flip){
+				if(true){
 						// Copy all of the data to a temporary stack-allocated array
 						auto copyData = new ubyte[mWidth*mHeight*3];
 						for(int i =0; i < mWidth*mHeight*3; ++i){
@@ -72,7 +83,6 @@ struct Image {
 								pos-=3;
 						}
 				}
-*/
 		}
 
 		void SetPixel(int x, int y, ubyte r, ubyte g, ubyte b){
@@ -102,6 +112,18 @@ struct Image {
 		}
 		uint GetHeight() const{
 			return mHeight;
+		}
+		
+		void WriteP3(){
+				File f= File("./debug.ppm","w");
+				f.writeln("#",m_filepath);
+				f.writeln("P3");
+				f.writeln(mWidth, " ", mHeight);
+				f.writeln(maxRange);
+				foreach(entry ; mPixelData){
+					f.write(entry," ");
+				}
+
 		}
 
 }

@@ -13,6 +13,7 @@ import glutility;
 
 struct GraphicsApplication{
 		Shader basicShader;
+		Shader normalShader;
 		Shader objShader;
 		Shader mRenderTargetShader;
 		Camera camera;
@@ -21,6 +22,8 @@ struct GraphicsApplication{
 		Object3D bunnyOBJ;
 		Object3D sponzaOBJ;
 		Object3D screenQuad;
+
+		vec3 lightPos;
 
 //		RenderTarget mRenderTarget;
 
@@ -56,19 +59,22 @@ struct GraphicsApplication{
 //				mRenderTarget = RenderTarget(mScreenWidth, mScreenHeight);
 
 				basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
-				triangleOBJ = Object3D("triangleOBJect name");
+				triangleOBJ = Object3D("triangleOBJectname");
 				triangleOBJ.Triangle();
 				triangleOBJ.make!Format3v3n();
 
-				objShader = Shader("./shaders/obj.vert","./shaders/obj.frag");
-				bunnyOBJ = Object3D("obj name");
-				bunnyOBJ.LoadGeometry("./bunny_centered.obj");
+				normalShader= Shader("./shaders/normal.vert","./shaders/normal.frag");
+				bunnyOBJ = Object3D("objname");
+				bunnyOBJ.LoadGeometry("./bunny_centered.obj","");
 				bunnyOBJ.make!Format3v3n();
 
-				sponzaOBJ= Object3D("Sponza Object");
-				sponzaOBJ.LoadGeometry("./sponza/sponza_triangulated.obj");
-				sponzaOBJ.LoadMaterial("./sponza/sponza_triangulated.mtl");
+				objShader = Shader("./shaders/obj.vert","./shaders/obj.frag");
+				sponzaOBJ= Object3D("SponzaObject");
+				sponzaOBJ.LoadGeometry("./sponza/sponza_triangulated.obj","./sponza/sponza_triangulated.mtl");
+
 				sponzaOBJ.make!Format3v3n2t();
+
+				lightPos = vec3(0.0f,5.0f,0.0f);
 
 /*
 				mRenderTargetShader = Shader("./shaders/renderTargetVert.glsl","./shaders/renderTargetFrag.glsl");
@@ -144,10 +150,13 @@ struct GraphicsApplication{
 				// Bind to the target that we want to draw to
 //				mRenderTarget.Bind();
 				// Render as normal
+				static float increment=0.0f;
 
 				// Select a shader
 				basicShader.Use();
-				triangleOBJ.Translate(0.0f,0.0f,0.0f);
+				triangleOBJ.Identity();
+				triangleOBJ.Translate(0.0f,2.0f,0.0f);
+				triangleOBJ.yRotation(-increment);
 
 				basicShader.SetMat4x4("uModel", triangleOBJ.mModelMatrix.ptr); 
 				basicShader.SetMat4x4("uView", view.ptr); 
@@ -155,22 +164,20 @@ struct GraphicsApplication{
 				triangleOBJ.Draw();
 
 				// Draw obj object
-				objShader.Use();
+				normalShader.Use();
 
 				bunnyOBJ.Identity();
 				bunnyOBJ.Translate(0.0f,4.0f,0.0f);
 				bunnyOBJ.Scale(0.5,0.5,0.5);
-				static float increment=0.0f;
 				bunnyOBJ.yRotation(increment+=0.01f);
 				if(increment>360){increment=0.0f;}
 
-				objShader.SetMat4x4("uModel", bunnyOBJ.mModelMatrix.ptr); 
-				objShader.SetMat4x4("uView", view.ptr); 
-				objShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
-
+				normalShader.SetMat4x4("uModel", bunnyOBJ.mModelMatrix.ptr); 
+				normalShader.SetMat4x4("uView", view.ptr); 
+				normalShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
 				bunnyOBJ.Draw();
-				objShader.Use();
 
+				objShader.Use();
 				sponzaOBJ.Identity();
 				sponzaOBJ.Translate(0.0f,0.0f,0.0f);
 				sponzaOBJ.Scale(2.0f,2.0f,2.0f);
@@ -178,6 +185,8 @@ struct GraphicsApplication{
 				objShader.SetMat4x4("uModel", sponzaOBJ.mModelMatrix.ptr); 
 				objShader.SetMat4x4("uView", view.ptr); 
 				objShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
+				objShader.SetInt("uDiffTexture",0);
+				objShader.SetVec3("uLightPos",lightPos.x,lightPos.y,lightPos.z);
 				sponzaOBJ.Draw();
 				// Bind to a 'default' render target
 //				glBindFramebuffer(GL_FRAMEBUFFER,0);
