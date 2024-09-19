@@ -11,21 +11,71 @@ import rendertarget;
 import camera;
 import glutility;
 
+struct LightManager{
+
+		static Light* CreateLight(float x, float y, float z){
+				auto light = new Light(x,y,z);
+				return light;
+		}
+}
+
+struct Light{
+		enum Type {POINT, HEMISPHERE, DIRECTION};
+
+		Type type;
+		vec3 mLightPos;
+		this(float x, float y, float z){
+				mLightPos = vec3(x,y,z);	
+		}
+}
+
+// TODO:
+// Add error checking to only have one shader active at a time
+// Add ability to dump uniforms out
+static struct ShaderManager{
+
+		static Shader*[string] mShaderMap;	
+
+		// Factory function for creating shaders
+		static Shader* CreateShader(string name,string vertexShaderPath, string fragmentShaderPath){
+				auto shader = new Shader(name, vertexShaderPath,fragmentShaderPath);
+				// Add to map
+				mShaderMap[name] = shader;
+				return shader;
+		}
+
+		// Convienent way to access shader
+		// FEATURE - 
+		static opIndex(T)(T shaderName){
+				return GetShader(shaderName);	
+		}
+
+		// Returns a pointer to a shader
+		static GetShader(string name){
+				if(name in mShaderMap){
+						return mShaderMap[name];
+				}else{
+					import std.array;
+					import std.algorithm;
+					// FEATURE - Dump out possible keys on error in a sorted list.
+					//           TODO show possible match with levenstein distance.
+					writeln("Did not find shader:",	name);
+					mShaderMap.keys.array.sort.writeln('\t');
+					assert(0,"shader was not found");
+				}
+		}	
+}
+
 struct GraphicsApplication{
-		Shader basicShader;
-		Shader normalShader;
-		Shader objShader;
-		Shader mRenderTargetShader;
+		ShaderManager mShaderManager;
+
 		Camera camera;
+		vec3 lightPos;
 
 		Object3D triangleOBJ;
 		Object3D bunnyOBJ;
 		Object3D sponzaOBJ;
 		Object3D screenQuad;
-
-		vec3 lightPos;
-
-//		RenderTarget mRenderTarget;
 
 		SDL_Window* mWindow;
 		int mScreenWidth = 800;
@@ -56,19 +106,23 @@ struct GraphicsApplication{
 				camera = Camera(0);
 
 				// Initialize our own frame buffer
-//				mRenderTarget = RenderTarget(mScreenWidth, mScreenHeight);
+				//				mRenderTarget = RenderTarget(mScreenWidth, mScreenHeight);
 
-				basicShader = Shader("./shaders/vert.glsl","./shaders/frag.glsl");
+				mShaderManager.CreateShader("basic","./shaders/vert.glsl","./shaders/frag.glsl");
+				mShaderManager.CreateShader("normal","./shaders/normal.vert","./shaders/normal.frag");
+				mShaderManager.CreateShader("obj","./shaders/obj.vert","./shaders/obj.frag");
+
+				mShaderManager.CreateShader("renderTarget","./shaders/renderTargetVert.glsl","./shaders/renderTargetFrag.glsl");
+
+
 				triangleOBJ = Object3D("triangleOBJectname");
 				triangleOBJ.Triangle();
 				triangleOBJ.make!Format3v3n();
 
-				normalShader= Shader("./shaders/normal.vert","./shaders/normal.frag");
 				bunnyOBJ = Object3D("objname");
 				bunnyOBJ.LoadGeometry("./bunny_centered.obj","");
 				bunnyOBJ.make!Format3v3n();
 
-				objShader = Shader("./shaders/obj.vert","./shaders/obj.frag");
 				sponzaOBJ= Object3D("SponzaObject");
 				sponzaOBJ.LoadGeometry("./sponza/sponza_triangulated.obj","./sponza/sponza_triangulated.mtl");
 
@@ -76,12 +130,11 @@ struct GraphicsApplication{
 
 				lightPos = vec3(0.0f,5.0f,0.0f);
 
-/*
-				mRenderTargetShader = Shader("./shaders/renderTargetVert.glsl","./shaders/renderTargetFrag.glsl");
-				screenQuad= Object3D("screen quad name");
-				screenQuad.ScreenQuad();
-				screenQuad.make!Format3v2t();
-*/
+				/*
+					 screenQuad= Object3D("screen quad name");
+					 screenQuad.ScreenQuad();
+					 screenQuad.make!Format3v2t();
+				 */
 		}
 
 		// Destructor
@@ -148,23 +201,23 @@ struct GraphicsApplication{
 				glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 				// Bind to the target that we want to draw to
-//				mRenderTarget.Bind();
+				//				mRenderTarget.Bind();
 				// Render as normal
 				static float increment=0.0f;
 
 				// Select a shader
-				basicShader.Use();
+				ShaderManager["basic"].Use();
 				triangleOBJ.Identity();
 				triangleOBJ.Translate(0.0f,2.0f,0.0f);
 				triangleOBJ.yRotation(-increment);
 
-				basicShader.SetMat4x4("uModel", triangleOBJ.mModelMatrix.ptr); 
-				basicShader.SetMat4x4("uView", view.ptr); 
-				basicShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
+				ShaderManager["basic"].SetMat4x4("uModel", triangleOBJ.mModelMatrix.ptr); 
+				ShaderManager["basic"].SetMat4x4("uView", view.ptr); 
+				ShaderManager["basic"].SetMat4x4("uProjection", camera.mProjection.ptr); 
 				triangleOBJ.Draw();
 
 				// Draw obj object
-				normalShader.Use();
+				ShaderManager["normal"].Use();
 
 				bunnyOBJ.Identity();
 				bunnyOBJ.Translate(0.0f,4.0f,0.0f);
@@ -172,29 +225,29 @@ struct GraphicsApplication{
 				bunnyOBJ.yRotation(increment+=0.01f);
 				if(increment>360){increment=0.0f;}
 
-				normalShader.SetMat4x4("uModel", bunnyOBJ.mModelMatrix.ptr); 
-				normalShader.SetMat4x4("uView", view.ptr); 
-				normalShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
+				ShaderManager["normal"].SetMat4x4("uModel", bunnyOBJ.mModelMatrix.ptr); 
+				ShaderManager["normal"].SetMat4x4("uView", view.ptr); 
+				ShaderManager["normal"].SetMat4x4("uProjection", camera.mProjection.ptr); 
 				bunnyOBJ.Draw();
 
-				objShader.Use();
+				ShaderManager["obj"].Use();
 				sponzaOBJ.Identity();
 				sponzaOBJ.Translate(0.0f,0.0f,0.0f);
 				sponzaOBJ.Scale(2.0f,2.0f,2.0f);
-				
-				objShader.SetMat4x4("uModel", sponzaOBJ.mModelMatrix.ptr); 
-				objShader.SetMat4x4("uView", view.ptr); 
-				objShader.SetMat4x4("uProjection", camera.mProjection.ptr); 
-				objShader.SetInt("uDiffTexture",0);
-				objShader.SetVec3("uLightPos",lightPos.x,lightPos.y,lightPos.z);
+
+				ShaderManager["obj"].SetMat4x4("uModel", sponzaOBJ.mModelMatrix.ptr); 
+				ShaderManager["obj"].SetMat4x4("uView", view.ptr); 
+				ShaderManager["obj"].SetMat4x4("uProjection", camera.mProjection.ptr); 
+				ShaderManager["obj"].SetInt("uDiffTexture",0);
+				ShaderManager["obj"].SetVec3("uLightPos",lightPos.x,lightPos.y,lightPos.z);
 				sponzaOBJ.Draw();
 				// Bind to a 'default' render target
-//				glBindFramebuffer(GL_FRAMEBUFFER,0);
+				//				glBindFramebuffer(GL_FRAMEBUFFER,0);
 				// Draw our sceene to the target
-//				mRenderTargetShader.Use();
-//				mRenderTargetShader.SetInt("screenTexture",0);
+				//				mRenderTargetShader.Use();
+				//				mRenderTargetShader.SetInt("screenTexture",0);
 				// Draw a simple screen quad
-//				screenQuad.Draw();
+				//				screenQuad.Draw();
 
 				// Bind to 'no shader'
 				glUseProgram(0);

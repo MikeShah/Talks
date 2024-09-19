@@ -7,37 +7,38 @@ import bindbc.opengl;
 
 struct Shader{
 
-		GLuint handle;
-		string vertexShaderPath;
-		string fragmentShaderPath;
+		GLuint mHandle;
+		string mName;
+		string mVertexShaderPath;
+		string mFragmentShaderPath;
 		/**
 		 * Create the graphics pipeline
 		 *
 		 * @return void
 		 */
-		this(string vertexShaderFile, string fragmentShaderFile){
-				vertexShaderPath = vertexShaderFile;
-				fragmentShaderPath = fragmentShaderFile;
+		this(string name, string vertexShaderFile, string fragmentShaderFile){
+				mName = name;
+				mVertexShaderPath = vertexShaderFile;
+				mFragmentShaderPath = fragmentShaderFile;
 				char[] vertexShaderSource      = LoadShaderAsString(vertexShaderFile);
 				char[] fragmentShaderSource    = LoadShaderAsString(fragmentShaderFile);
 				
-
 				// Duplicate strings so that they do not get accidently destroyed
-				handle = CreateShaderProgram(vertexShaderSource.dup,fragmentShaderSource.dup);
+				mHandle = CreateShaderProgram(vertexShaderSource.dup,fragmentShaderSource.dup);
 		}
 
 		/**
-			Get the shader handle which is returned as an integer
+			Get the shader mHandle which is returned as an integer
 		 */
 		GLuint GetHandle() const{
-				return handle;
+				return mHandle;
 		}
 
 		/**
 			Use the shader program
 		 */
 		void Use(){
-				glUseProgram(handle);
+				glUseProgram(mHandle);
 		}
 
 		/**
@@ -95,9 +96,9 @@ struct Shader{
 
 								writeln("ERROR: "~to!string(type)~" compilation failed!\n", errorMessages, "\n");
 								if(type==GL_VERTEX_SHADER){
-									writeln("=========failed: vertex shader",vertexShaderPath,"\n",source);
+									writeln("=========failed: vertex shader",mVertexShaderPath,"\n",source);
 								}else{
-									writeln("=========failed: fragment shader",fragmentShaderPath,"\n",source);
+									writeln("=========failed: fragment shader",mFragmentShaderPath,"\n",source);
 								}
 
 								// Delete our broken shader
@@ -170,7 +171,7 @@ struct Shader{
 		// the program will terminate
 		// TODO: Consider if I want to 'terminate' or otherwise assert, or log the error.
 		int GetAndCheckUniformLocation(const char* symbol){
-				GLint location = glGetUniformLocation(handle, symbol);
+				GLint location = glGetUniformLocation(mHandle, symbol);
 				if(location < 0){
 						writeln("Could not find ",symbol.to!string,", maybe a mispelling or symbol was not used in shader\n");
 						import core.stdc.stdlib;
@@ -191,7 +192,7 @@ struct Shader{
 	 foreach(t; params){
 	 body ~= t;
 	 }
-//GLint location = glGetUniformLocation(handle,symbol);
+//GLint location = glGetUniformLocation(mHandle,symbol);
 string code = "int "~Name~"("~body~"){return 0;}";
 return code;
 }else{

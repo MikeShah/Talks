@@ -40,7 +40,7 @@ struct Format3v3n2t{
 // A 3D object may be broken into 'chunks', and thus
 // has its own vertex data.
 struct Chunk{
-		int mVertices = 0;
+		ulong mVertices = 0;
 		GLfloat[] mVertexData;
 		GLuint mVAO = 0;
 		GLuint mVBO = 0;
@@ -124,7 +124,9 @@ struct Chunk{
 
 				// Calculate in some way the number of vertices
 				// TODO: Derive this accurately
-				mVertices = cast(int)mVertexData.length/8;
+				static assert(float.sizeof == 4L);
+				enum ulong dataSize = T.sizeof;
+				mVertices = cast(int)mVertexData.length/(dataSize/4L);
 		}
 
 		void Draw(int slot=0){
@@ -137,7 +139,7 @@ struct Chunk{
 				}
 				}
 				//Render data
-				glDrawArrays(GL_TRIANGLES,0, mVertices);
+				glDrawArrays(GL_TRIANGLES,0, cast(uint)mVertices);
 		}
 }
 
