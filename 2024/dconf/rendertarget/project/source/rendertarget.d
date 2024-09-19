@@ -1,8 +1,9 @@
 module rendertarget;
 
 import std.stdio;
-import glad.gl.all;
-import glad.gl.loader;
+
+import bindbc.sdl;
+import bindbc.opengl;
 
 /// 3D Objects
 struct RenderTarget{

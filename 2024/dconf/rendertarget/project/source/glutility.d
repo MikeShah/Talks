@@ -1,6 +1,6 @@
 import std.stdio;
-import glad.gl.all;
-import glad.gl.loader;
+
+import bindbc.opengl;
 
 void glInformation(){
 		import std.string;

@@ -2,8 +2,8 @@ module shader;
 
 import std.stdio;
 import std.conv;
-import glad.gl.all;
-import glad.gl.loader;
+import bindbc.sdl;
+import bindbc.opengl;
 
 struct Shader{
 
@@ -70,7 +70,6 @@ struct Shader{
 						// Based on the type passed in, we create a shader object specifically for that
 						// type.
 						shaderObject = glCreateShader(type);
-
 						char* sourceCodePtr = source.ptr;
 
 						glShaderSource(shaderObject, 1, &sourceCodePtr, null);
@@ -146,9 +145,9 @@ struct Shader{
 				glUniform1i(location,value);
 		}
 
-		void SetMat4x4(const char* symbol, GLfloat* value){	
+		void SetMat4x4(const char* symbol, const GLfloat* value){	
 				GLint location = GetAndCheckUniformLocation(symbol);
-				glUniformMatrix4fv(location,1,GL_FALSE,value);
+				glUniformMatrix4fv(location,1,GL_TRUE,value);
 		}
 
 		private:

@@ -1,6 +1,5 @@
 module object3d;
 
-import glad.gl.all;
 
 import std.stdio;
 import std.algorithm;
@@ -9,9 +8,12 @@ import std.conv;
 import std.ascii;
 import std.string;
 
+import bindbc.sdl;
+import bindbc.opengl;
+import inmath.linalg;
+
 import texture;
 import material;
-import linearalgebra;
 
 // Vertex Structures for format 
 struct Format3v3n{
@@ -33,24 +35,67 @@ struct Format3v3n2t{
 }
 
 
-struct Transformation{
-		mat4!float mMatrix;
+// A 3D object may be broken into 'chunks', and thus
+// has its own vertex data.
+struct Chunk(T){
+		int mVertices = 0;
+		GLfloat[] mVertexData;
+		Material mMaterial;
+		GLuint mVAO = 0;
+		GLuint mVBO = 0;
+		Texture mTexture;
+		this(string materialName){
+						
+		}
+		// Pass in a struct and we will create the appropriate
+		// model format
+		void make(T)(){
+				// Vertex Arrays Object (VAO) Setup
+				glGenVertexArrays(1, &mVAO);
+				// We bind (i.e. select) to the Vertex Array Object (VAO) that we want to work withn.
+				glBindVertexArray(mVAO);
 
-		@disable this();
+				// Vertex Buffer Object (VBO) creation
+				glGenBuffers(1, &mVBO);
+				glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+				glBufferData(GL_ARRAY_BUFFER, mVertexData.length* GLfloat.sizeof, mVertexData.ptr, GL_STATIC_DRAW);
 
-		this(int i){
-				SetDefault();
+				// Create an array of offsets
+				mixin("ulong[",T.tupleof.length,"] offsets;");;
+				mixin("offsets[0] = 0;");
+
+				static foreach (idx, m; T.tupleof) {
+						//          pragma(msg,idx);
+						//			pragma(msg,typeof(m));
+						//			pragma(msg,m.stringof);
+						//			pragma(msg,m.sizeof);
+
+						// Vertex attributes
+						//            pragma(msg,"glEnableVertexAttribArray(",idx,");");
+						mixin("glEnableVertexAttribArray(",idx,");");
+						//            pragma(msg,"glVertexAttribPointer(",idx,", ",m.sizeof/float.sizeof,", GL_FLOAT, GL_FALSE, ",T.sizeof,", cast(GLvoid*)(GLfloat.sizeof*offsets[idx]));");
+						mixin("glVertexAttribPointer(",idx,", ",m.sizeof/float.sizeof,", GL_FLOAT, GL_FALSE, ",T.sizeof,", cast(GLvoid*)(GLfloat.sizeof*offsets[idx]));");
+						static if(idx+1 < T.tupleof.length){
+								mixin("offsets[",idx+1,"] = offsets[",idx,"] + ",m.sizeof/float.sizeof,";");
+						}
+				}
+				//        writeln(mixin("offsets"));
+
+				// Unbind vertex array
+				glBindVertexArray(0);
+				// Disable attributes
+				static foreach (idx, m; T.tupleof) {
+						//           pragma(msg,"glDisableVertexAttribArray(",idx,");");
+						mixin("glDisableVertexAttribArray(",idx,");");
+				}
+				//       pragma(msg,"");
 		}
 
-		void SetDefault(){
-				mMatrix.makeIdentity!float();
-		}
-
-		mat4!float GetTransform(){
-				return mMatrix;
-		}
-		float[] GetTransformFlattened(){
-				return mMatrix.flatten!float;
+		void Draw(){
+				// Enable our attributes
+				glBindVertexArray(mVAO);
+				//Render data
+				glDrawArrays(GL_TRIANGLES,0, mVertices);
 		}
 }
 
@@ -58,27 +103,27 @@ struct Transformation{
 /// 3D Objects
 struct Object3D{
 		string mName;
-		GLuint mVAO = 0;
-		GLuint mVBO = 0;
-		GLfloat[] mVertexData;
-		int mVertices = 0;
-		Texture mTexture;
-		Material[] mMaterials;
-		Transformation mTransform;
+		int mTotalVertices = 0;
+		mat4 mModelMatrix;;
+		Chunk[] mChunks;
 
-		void Translate(float x, float y, float z){
-				mTransform.mMatrix = MakeTranslationMatrix(vec3!float(x,y,z));	
+		void Identity(){
+			mModelMatrix = mat4.identity;
 		}
-		float* GetModelMatrixPtr(){
-				auto result= mTransform.GetTransformFlattened.ptr;
-
-				return result;	
+		
+		void Translate(float x, float y, float z){
+				mModelMatrix *= mat4.translation(vec3(x,y,z));
+		}
+		void Scale(float x, float y, float z){
+				mModelMatrix *= mat4.scaling(x,y,z);
+		}
+		void yRotation(float angle){
+				mModelMatrix *= mat4.yRotation(angle);
 		}
 
 		this(string name){
 				this.mName = name;
-				mTransform = Transformation(1);
-				mTransform.SetDefault();
+				mModelMatrix = mat4.identity;
 		}
 
 		void Triangle(){
@@ -153,27 +198,32 @@ struct Object3D{
 												});
 								//                writeln(line.splitter(" ").array);
 						}
+						else if(line.startsWith("usemtl")){
+							auto tokens = line.splitter(" ").array.remove(0).strip("");
+							Chunk newChunk(tokens[1]);
+							mChunks ~= newChunk;
+						}
 						else if(line.startsWith("f ")){
 								auto face = line.splitter(" ").array.remove(0).strip("");
 								foreach(indice; face){
 										auto component = indice.splitter("/").array;
 										if(component[0]!=""){
 												int idx = (parse!int(component[0]) - 1 ) * 3;
-												mVertexData~= [vertices[idx], vertices[idx+1], vertices[idx+2]];
+												mChunks[$-1].mVertexData~= [vertices[idx], vertices[idx+1], vertices[idx+2]];
 										}
 										if(component[2]!=""){
 												int idx= (parse!int(component[2]) - 1 ) * 3;
-												mVertexData ~= [normals[idx+0], normals[idx+1], normals[idx+2]];
+												mChunks[$-1].mVertexData ~= [normals[idx+0], normals[idx+1], normals[idx+2]];
 										}
 										if(component[1]!=""){
 												int idx= (parse!int(component[1]) - 1 ) * 2;
-												mVertexData ~= [texture_coords[idx+0], texture_coords[idx+1]];
+												mChunks[$-1].mVertexData ~= [texture_coords[idx+0], texture_coords[idx+1]];
 										}
 								}
 						}
 				}
 
-				mVertices = cast(int)mVertexData.length/6;
+				mVertices = cast(int)mVertexData.length/8;
 				writeln("flattened data length: ",mVertexData.length);
 				writeln("vertices", mVertices);
 				//        writeln(mVertexData);
@@ -205,55 +255,4 @@ struct Object3D{
 
 		}
 
-
-		// Pass in a struct and we will create the appropriate
-		// model format
-		void make(T)(){
-				// Vertex Arrays Object (VAO) Setup
-				glGenVertexArrays(1, &mVAO);
-				// We bind (i.e. select) to the Vertex Array Object (VAO) that we want to work withn.
-				glBindVertexArray(mVAO);
-
-				// Vertex Buffer Object (VBO) creation
-				glGenBuffers(1, &mVBO);
-				glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-				glBufferData(GL_ARRAY_BUFFER, mVertexData.length* GLfloat.sizeof, mVertexData.ptr, GL_STATIC_DRAW);
-
-				// Create an array of offsets
-				mixin("ulong[",T.tupleof.length,"] offsets;");;
-				mixin("offsets[0] = 0;");
-
-				static foreach (idx, m; T.tupleof) {
-						//          pragma(msg,idx);
-						//			pragma(msg,typeof(m));
-						//			pragma(msg,m.stringof);
-						//			pragma(msg,m.sizeof);
-
-						// Vertex attributes
-						//            pragma(msg,"glEnableVertexAttribArray(",idx,");");
-						mixin("glEnableVertexAttribArray(",idx,");");
-						//            pragma(msg,"glVertexAttribPointer(",idx,", ",m.sizeof/float.sizeof,", GL_FLOAT, GL_FALSE, ",T.sizeof,", cast(GLvoid*)(GLfloat.sizeof*offsets[idx]));");
-						mixin("glVertexAttribPointer(",idx,", ",m.sizeof/float.sizeof,", GL_FLOAT, GL_FALSE, ",T.sizeof,", cast(GLvoid*)(GLfloat.sizeof*offsets[idx]));");
-						static if(idx+1 < T.tupleof.length){
-								mixin("offsets[",idx+1,"] = offsets[",idx,"] + ",m.sizeof/float.sizeof,";");
-						}
-				}
-				//        writeln(mixin("offsets"));
-
-				// Unbind vertex array
-				glBindVertexArray(0);
-				// Disable attributes
-				static foreach (idx, m; T.tupleof) {
-						//           pragma(msg,"glDisableVertexAttribArray(",idx,");");
-						mixin("glDisableVertexAttribArray(",idx,");");
-				}
-				//       pragma(msg,"");
-		}
-
-		void Draw(){
-				// Enable our attributes
-				glBindVertexArray(mVAO);
-				//Render data
-				glDrawArrays(GL_TRIANGLES,0, mVertices);
-		}
 }

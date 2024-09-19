@@ -6,8 +6,8 @@
  *  @author Mike
  *  @bug No known bugs.
  */
-import glad.gl.all;
-import glad.gl.loader;
+import bindbc.sdl;
+import bindbc.opengl;
 
 import image;
 
