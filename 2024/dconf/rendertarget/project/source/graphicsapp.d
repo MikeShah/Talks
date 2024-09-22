@@ -12,7 +12,6 @@ import camera;
 import glutility;
 
 struct LightManager{
-
 		static Light* CreateLight(float x, float y, float z){
 				auto light = new Light(x,y,z);
 				return light;
@@ -20,12 +19,20 @@ struct LightManager{
 }
 
 struct Light{
-		enum Type {POINT, HEMISPHERE, DIRECTION};
+		// TODO: Pick a specific light
+		enum Type {POINT, HEMISPHERE, DIRECTIONAL};
 
 		Type type;
 		vec3 mLightPos;
+
+		bool ShowShape=true;
+		Object3D triangleOBJ;
+
 		this(float x, float y, float z){
 				mLightPos = vec3(x,y,z);	
+				triangleOBJ = Object3D("Triangle Light");
+				triangleOBJ.Triangle();
+				triangleOBJ.make!Format3v3n();
 		}
 }
 
@@ -159,22 +166,22 @@ struct GraphicsApplication{
 
 				const ubyte* keyboardState = SDL_GetKeyboardState(null);
 
-				if(keyboardState[SDL_SCANCODE_LEFT]){
+				if(keyboardState[SDL_SCANCODE_A]){
 						camera.MoveLeft(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_RIGHT]){
+				if(keyboardState[SDL_SCANCODE_D]){
 						camera.MoveRight(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_UP]){
+				if(keyboardState[SDL_SCANCODE_W]){
 						camera.MoveForward(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_DOWN]){
+				if(keyboardState[SDL_SCANCODE_A]){
 						camera.MoveBackward(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_W]){
+				if(keyboardState[SDL_SCANCODE_UP]){
 						camera.MoveUp(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_S]){
+				if(keyboardState[SDL_SCANCODE_DOWN]){
 						camera.MoveDown(0.1f);
 				}
 				if(keyboardState[SDL_SCANCODE_ESCAPE]){
