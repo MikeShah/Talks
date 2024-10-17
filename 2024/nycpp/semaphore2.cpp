@@ -4,7 +4,7 @@
 // g++ -std=c++23 semaphore1.cpp -o prog -lpthread
 #include <iostream>
 #include <vector>
-//#include <print>
+#include <print>
 #include <thread>   // Include the thread library
 #include <semaphore>// semaphore for synchronization
 
@@ -16,9 +16,9 @@ void WorkerThread(int arg){
 	// with the semaphore, such that '1' less
 	// piece of work can pass by. 
 	gSem.acquire();
-		std::cout << "thread.id:" << std::this_thread::get_id() << std::endl;
-		//std::println("thread.get_id:{}", std::this_thread::get_id());
-		//std::println("Argument passed in:{}", arg);
+        size_t tid = std::hash<std::thread::id>{}(std::this_thread::get_id());
+		std::println("thread.get_id:{}", tid);
+		std::println("Argument passed in:{}", arg);
 		gCounter++;
 	gSem.release();
 }
@@ -31,7 +31,7 @@ int main() {
 			js.push_back(std::jthread(WorkerThread,i));
 		}
 		// Proceed to do any useful work
-		std::cout << "Hello from the main thread!" << std::endl;
+		std::println("Hello from the main thread!");
 
 		// Our worker thread is always blocked until 
 		// we 'release' or 'signal' that we are ready.
@@ -40,7 +40,7 @@ int main() {
 		gSem.release();
 
 		  // Continue executing the main thread
-	  	std::cout << std::endl << "gCounter = " << gCounter << std::endl;
+	  	std::println("gCounter = {}",gCounter);
 
 		return 0;
 }
