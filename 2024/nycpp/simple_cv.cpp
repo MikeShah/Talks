@@ -1,6 +1,6 @@
 // @file simple_cv.cpp
 // g++ -std=c++23 simple_cv.cpp -o prog -lpthread
-#include <iostream>
+#include <print>
 #include <tuple>
 #include <condition_variable>
 #include <thread>
@@ -49,7 +49,7 @@ static void consumer() {
         std::unique_lock<std::mutex> l {shared_lock_between_producerconsumer};
         cv.wait(l, [] { return !shared_queue.empty() || ready; });
 
-        std::cout << "Consuming new value from shared_queue: " << shared_queue.front() << std::endl;
+        std::print("Consuming new value from shared_queue: {}", shared_queue.front());
         shared_queue.pop();
     }
 }

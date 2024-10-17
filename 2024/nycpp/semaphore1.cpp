@@ -1,6 +1,7 @@
 // @file semaphore1.cpp 
 // g++ -std=c++23 semaphore1.cpp -o prog -lpthread
 #include <vector>
+#include <chrono>
 #include <print>
 #include <thread>   // Include the thread library
 #include <semaphore>// semaphore for synchronization
@@ -28,6 +29,7 @@ int main() {
 		// we 'release' or 'signal' that we are ready.
 		// 'release' increments our counter, making available one more
 		// 'slot' to acquire from the semaphore.
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		gSem.release();
 
 		gSem.acquire();

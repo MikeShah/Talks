@@ -1,7 +1,5 @@
-// NOTE: This example doesn't really work, we need better primtives
-
-// @file semaphore1.cpp 
-// g++ -std=c++23 semaphore1.cpp -o prog -lpthread
+// @file semaphore2.cpp 
+// g++ -std=c++23 semaphore2.cpp -o prog -lpthread
 #include <iostream>
 #include <vector>
 #include <print>
@@ -9,7 +7,7 @@
 #include <semaphore>// semaphore for synchronization
 
 int gCounter =0;
-std::binary_semaphore gSem(0);
+std::binary_semaphore gSem(1);
 
 void WorkerThread(int arg){
 	// Acquire 'decrements' the counter associated
@@ -26,6 +24,7 @@ void WorkerThread(int arg){
 int main() {
 		// Launch a thread
 		std::vector<std::jthread> js;
+        js.reserve(100);
 
 		for(size_t i=0; i < 100; ++i){
 			js.push_back(std::jthread(WorkerThread,i));
@@ -37,10 +36,11 @@ int main() {
 		// we 'release' or 'signal' that we are ready.
 		// 'release' increments our counter, making available one more
 		// 'slot' to acquire from the semaphore.
-		gSem.release();
+		gSem.acquire();
 
 		  // Continue executing the main thread
 	  	std::println("gCounter = {}",gCounter);
+		gSem.release();
 
 		return 0;
 }
