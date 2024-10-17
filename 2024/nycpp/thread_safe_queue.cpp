@@ -7,7 +7,9 @@
 #include <queue>
 #include <latch>
 
-std::counting_semaphore tasks(100);
+//std::counting_semaphore tasks(100); // No need to manage counting semaphore.
+                                      // This example uses a latch which 'counts down' until 
+                                      // finished.
 
 // Thread-Safe namespace for versions of containers.
 namespace ThreadSafe{
@@ -78,5 +80,3 @@ int main() {
 
 		return 0;
 }
-
-
