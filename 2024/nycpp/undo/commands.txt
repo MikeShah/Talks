@@ -5,4 +5,4 @@ g++-11 -g -std=c++23 ../thread3.cpp -o prog -lpthread
 sudo ~/Downloads/Undo-Suite-x86-8.0.0/live-record --recording-file recording.undo ./prog
 
 # Replay the recording and step through
-~/Downloads/Undo-Suite-x86-8.0.0/live-record --recording-file recording.undo ./prog
+sudo ~/Downloads/Undo-Suite-x86-8.0.0/udb recording.undo

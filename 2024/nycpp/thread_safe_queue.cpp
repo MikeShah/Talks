@@ -1,6 +1,6 @@
 // @file thread_safe_queue.cpp 
-// g++ -std=c++23 thread_safe_queue.cpp -o prog -lpthread
-#include <print>
+// g++-11 -std=c++23 thread_safe_queue.cpp -o prog -lpthread
+#include <iostream>
 #include <vector>
 #include <thread>   // Include the thread library
 #include <mutex>
@@ -45,7 +45,8 @@ namespace ThreadSafe{
 }
 
 int main() {
-        std::println();
+        //std::println();
+				std::cout << std::endl;
 
         const int problemSize = 100;
         ThreadSafe::Queue q;
@@ -71,12 +72,13 @@ int main() {
         jobsToComplete.wait();
 
         for(size_t i=0; i < problemSize; ++i){
-            std::print("{},",q.front());
+//            std::print("{},",q.front());
+						std::cout << q.front() << ",";
             q.pop();
         }
 
 		// Continue executing the main thread
-		std::println("\n\nEnd of main thread!");
-
+//		std::println("\n\nEnd of main thread!");
+		std::cout << "\n\nEnd of main thread!" << std::endl;
 		return 0;
 }

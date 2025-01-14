@@ -1,6 +1,6 @@
 // @file team50000.cpp
-// g++ -std=c++23 team.cpp -o prog -lpthread
-#include <print>
+// g++-11 -g -std=c++23 team.cpp -o prog -lpthread
+#include <iostream>
 #include <thread>   // Include the thread library
 #include <vector>
 #include <array>
@@ -37,18 +37,18 @@ int main() {
 						threads.push_back(std::jthread(AdditionWorker,i,64));
 				} 
 		}
-		std::println("threads.size: {}", threads.size());
+		std::cout << "threads.size: " << threads.size() << std::endl;
 
         // Ensure all threads have been joined
         for(int i=0; i < threads.size();i++){  threads[i].join();  }
 
 		// Continue executing the main thread
-		std::println("Job completed -- in main thread and printing results");
+		std::cout << "Job completed -- in main thread and printing results\n";
 		// Write out data
 		for(size_t i=0; i < shared_global_data.size(); i++){
-				std::print("[{0:3}] {1:2} ",i,shared_global_data[i]);
-                if(i%10==0){std::println();}
+				std::cout << i << ") " <<shared_global_data[i];
+                if(i%10==0){std::cout << std::endl;}
 		}
-		std::println();
+		std::cout << std::endl;
 		return 0;
 }

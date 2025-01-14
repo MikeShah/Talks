@@ -1,6 +1,7 @@
 // @file simple_cv.cpp
-// g++ -std=c++23 simple_cv.cpp -o prog -lpthread
-#include <print>
+// g++ -g -std=c++23 simple_cv.cpp -o prog -lpthread
+//#include <print>
+#include <iostream>
 #include <tuple>
 #include <condition_variable>
 #include <thread>
@@ -21,6 +22,7 @@ std::queue<int> 		shared_queue;
 // Producers goal is to otherwise 'add' or 'modify' data
 static void producer() {
 
+    std::this_thread::sleep_for(250ms);
     for(int i=0; i < 5; i++)
     {
         std::this_thread::sleep_for(250ms);
@@ -49,7 +51,7 @@ static void consumer() {
         std::unique_lock<std::mutex> l {shared_lock_between_producerconsumer};
         cv.wait(l, [] { return !shared_queue.empty() || ready; });
 
-        std::print("Consuming new value from shared_queue: {}", shared_queue.front());
+        std::cout << "Consuming new value from shared_queue: " << shared_queue.front() << std::endl;
         shared_queue.pop();
     }
 }
