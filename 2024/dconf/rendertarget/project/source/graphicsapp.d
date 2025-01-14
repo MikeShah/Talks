@@ -175,7 +175,7 @@ struct GraphicsApplication{
 				if(keyboardState[SDL_SCANCODE_W]){
 						camera.MoveForward(0.1f);
 				}
-				if(keyboardState[SDL_SCANCODE_A]){
+				if(keyboardState[SDL_SCANCODE_S]){
 						camera.MoveBackward(0.1f);
 				}
 				if(keyboardState[SDL_SCANCODE_UP]){
