@@ -28,7 +28,4 @@ void main(){
 //	v = v + 2.0f; // Illegal
 
 	writeln(v);
-
-	
-
 }
