@@ -1,32 +1,32 @@
 // @file: 01.cpp
 // 
-// linux: 			
-// g++ 01.cpp -o prog -lSDL3 && ./prog
-// cross-platform: 	
-// g++ 01.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// A few ways to build:
+// linux: 					g++ 01.cpp -o prog -lSDL3 && ./prog
+// cross-platform: 	g++ 01.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 int main(int argc, char *argv[]){
 	// Initialization
-	SDL_Init(SDL_INIT_VIDEO);
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, 
+					 "Couldn't initialize SDL: %s", 
+					 SDL_GetError());
+		return 3;
+	}
 
 	// Setup one SDL window
 	SDL_Window* window;
-	SDL_Event event;
 	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
 
-	// Main application loop
-	while (1) {
-		SDL_PollEvent(&event);
-		if (event.type == SDL_EVENT_QUIT) {
-			break;
-		}
-		if(event.type == SDL_EVENT_KEY_DOWN){
-			SDL_Log("Key was pressed!");
-			// Retrieve the 'virtual scancode'
-			SDL_Log("Keycode: %i",event.key.key);
-		}
+	if (nullptr == window) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, 
+					 "Couldn't create window and renderer: %s", 
+					 SDL_GetError());
+		return 3;
 	}
+
+	// Pause program so we can see window for 3 seconds
+	SDL_Delay(3000);
 
 	// Destroy any SDL objects we have allocated
 	SDL_DestroyWindow(window);
@@ -36,3 +36,4 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+

@@ -1,39 +1,37 @@
-// @file: 02.cpp
+// @file: 01.cpp
 // 
 // linux: 			
-// g++ 02.cpp -o prog -lSDL3 && ./prog
+// g++ 01.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 02.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 01.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 int main(int argc, char *argv[]){
-	// structures
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	SDL_Event event;
-
 	// Initialization
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_CreateWindowAndRenderer("Hello C++ North", 320, 240, 
-								SDL_WINDOW_RESIZABLE, &window, &renderer);
-	SDL_Log("Renderer: %s",SDL_GetRendererName(renderer));
+
+	// Setup one SDL window
+	SDL_Window* window;
+	SDL_Event event;
+	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
 
 	// Main application loop
-	int state=0;
 	while (1) {
 		SDL_PollEvent(&event);
 		if (event.type == SDL_EVENT_QUIT) {
 			break;
 		}
-
-		SDL_RenderClear(renderer);
-		SDL_SetRenderDrawColor(renderer, 0xFF,0x00,0x0,0xFF);				
-		SDL_RenderPresent(renderer);
+		if(event.type == SDL_EVENT_KEY_DOWN){
+			SDL_Log("Key was pressed!");
+			// Retrieve the 'virtual scancode'
+			SDL_Log("Keycode: %i",event.key.key);
+		}
 	}
 
-	// Explicit cleanup of allocated resources
-	SDL_DestroyRenderer(renderer);
+	// Destroy any SDL objects we have allocated
 	SDL_DestroyWindow(window);
+
+	// Quit SDL and shutdown systems we have initialized
 	SDL_Quit();
 
 	return 0;
