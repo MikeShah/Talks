@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
 	SDL_Init(SDL_INIT_VIDEO);
 
 	// Setup one SDL window
-	SDL_Window* window;
+	SDL_Window* window = nullptr;
 	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
 
 	// Pause program so we can see window for 3 seconds
