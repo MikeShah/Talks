@@ -1,9 +1,9 @@
-// @file: 02.cpp
+// @file: 02_event_loop.cpp
 // 
 // linux: 			
-// g++ 02.cpp -o prog -lSDL3 && ./prog
+// g++ 02_event_loop.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 02.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 02_event_loop.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 int main(int argc, char *argv[]){

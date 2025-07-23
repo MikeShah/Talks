@@ -1,10 +1,10 @@
 
-// @file: abstraction.cpp
+// @file: abstraction_warning.cpp
 // 
 // linux: 			
-// g++ abstraction.cpp -o prog -lSDL3 && ./prog
+// g++ abstraction_warning.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ abstraction.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ abstraction_warning.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 struct Texture{

@@ -1,9 +1,9 @@
-// @file: 04.cpp
+// @file: 04_events_renderer.cpp
 // 
 // linux: 			
-// g++ 04.cpp -o prog -lSDL3 && ./prog
+// g++ 04_events_renderer.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 04.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 04_events_renderer.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 int main(int argc, char *argv[]){
 	// structures

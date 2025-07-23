@@ -1,12 +1,6 @@
 // gcc gpu.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
-// TODO: 
-// Look at SDL_ShaderCross
-// In CppNorth Video, talk about SpirV (it's purpose, and how it's an IR bytecode, similar to how some of you might think of LLVM bytecode).
-//
-
-
 int main(){
 
 	// (1) Before we call any SDL function
@@ -15,8 +9,8 @@ int main(){
 		return -1; 
 	}
 	SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
-	// TODO:
-	// Can do more with: https://wiki.libsdl.org/SDL3/SDL_SetLogOutputFunction
+	// Note: You can do more with:
+	// https://wiki.libsdl.org/SDL3/SDL_SetLogOutputFunction
 
 	// (2) thing is to create a window
 	SDL_Window* window;
@@ -24,8 +18,8 @@ int main(){
 
 	// (3) Setup the GPU Device API
 	SDL_GPUDevice* gpuDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV,
-			true,
-			nullptr/*"vulkan"*/);
+	true,
+	nullptr/*"vulkan"*/);
 
 	// Claim a window for creating a 'swapchain' structure.
 	// The 'swapchain' is the collection of buffers used to effectively refresh our

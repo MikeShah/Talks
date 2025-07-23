@@ -1,9 +1,9 @@
-// @file: 05.cpp
+// @file: 05_abstraction.cpp
 // 
 // linux: 			
-// g++ 05.cpp -o prog -lSDL3 && ./prog
+// g++ 05_abstraction.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 05.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 05_abstraction.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 struct SDLApplication{

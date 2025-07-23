@@ -1,8 +1,8 @@
-// @file: 01.cpp
+// @file: 01_error_handling.cpp
 // 
 // A few ways to build:
-// linux: 					g++ 01.cpp -o prog -lSDL3 && ./prog
-// cross-platform: 	g++ 01.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// linux: 					g++ 01_error_handling.cpp -o prog -lSDL3 && ./prog
+// cross-platform: 	g++ 01_error_handling.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 int main(int argc, char *argv[]){
