@@ -1,9 +1,9 @@
-// @file: 03.cpp
+// @file: 04.cpp
 // 
 // linux: 			
-// g++ 03.cpp -o prog -lSDL3 && ./prog
+// g++ 04.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 03.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 04.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 int main(int argc, char *argv[]){
 	// structures
@@ -18,14 +18,15 @@ int main(int argc, char *argv[]){
 	// Main application loop
 	int state=0;
 	while (1) {
-		SDL_PollEvent(&event);
-		if (event.type == SDL_EVENT_QUIT) {
-			break;
-		}
-		if(event.type == SDL_EVENT_KEY_DOWN && event.key.key==SDLK_R){
-			state =1;
-		}else if(event.type == SDL_EVENT_KEY_DOWN){
-			state =0;
+		if(SDL_PollEvent(&event)){
+			if (event.type == SDL_EVENT_QUIT) {
+				break;
+			}
+			if(event.type == SDL_EVENT_KEY_DOWN && event.key.key==SDLK_R){
+				state =1;
+			}else if(event.type == SDL_EVENT_KEY_DOWN){
+				state =0;
+			}
 		}
 
 		SDL_RenderClear(renderer);

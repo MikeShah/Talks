@@ -1,10 +1,23 @@
-// @file: 06_texture.cpp
+
+// @file: abstraction.cpp
 // 
 // linux: 			
-// g++ 06_texture.cpp -o prog -lSDL3 && ./prog
+// g++ abstraction.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 06_texture.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ abstraction.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
+
+struct Texture{
+	SDL_Texture* mTexture;
+	Texture(SDL_Renderer* r, const char* filename){
+		SDL_Surface* surface = SDL_LoadBMP(filename);
+		mTexture = SDL_CreateTextureFromSurface(r,surface);
+		SDL_DestroySurface(surface);	
+	}
+	~Texture(){
+		SDL_DestroyTexture(mTexture);
+	}
+};
 
 struct SDLApplication{
 	SDL_Window *mWindow;
@@ -23,6 +36,7 @@ struct SDLApplication{
 		
 		mSurface = SDL_LoadBMP("test.bmp");
 		mTexture = SDL_CreateTextureFromSurface(mRenderer,mSurface);
+		SDL_DestroySurface(mSurface);
 	}
 
 	void Cleanup(){
@@ -54,6 +68,7 @@ struct SDLApplication{
 			}else if(event.type == SDL_EVENT_KEY_DOWN){
 				state =0;
 			}
+			
 
 			SDL_RenderClear(mRenderer);
 

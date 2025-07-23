@@ -1,9 +1,9 @@
-// @file: 06_texture.cpp
+// @file: 07_animated.cpp.cpp
 // 
 // linux: 			
-// g++ 06_texture.cpp -o prog -lSDL3 && ./prog
+// g++ 07_animated.cpp.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 06_texture.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 07_animated.cpp.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 struct SDLApplication{
@@ -21,7 +21,7 @@ struct SDLApplication{
 	void Initialization(){
 		SDL_Init(SDL_INIT_VIDEO);
 		
-		mSurface = SDL_LoadBMP("test.bmp");
+		mSurface = SDL_LoadBMP("mario.bmp");
 		mTexture = SDL_CreateTextureFromSurface(mRenderer,mSurface);
 	}
 
@@ -40,8 +40,13 @@ struct SDLApplication{
 		SDL_FRect rect;
 		rect.x = 0;
 		rect.y = 0;
-		rect.w = 64;
-		rect.h = 64;
+		rect.w = 60;
+		rect.h = 80;
+		SDL_FRect src_rect;
+		src_rect.x = 0;
+		src_rect.y = 0;
+		src_rect.w = 30;
+		src_rect.h = 40;
 
 		while (1) {
 			SDL_Event event;
@@ -63,9 +68,16 @@ struct SDLApplication{
 				SDL_SetRenderDrawColor(mRenderer, 0xFF,0xFF,0x0,0xFF);	
 			}
 
+
 			// Render a texture, seleting the texels based on
 			// the rectangle.
-			SDL_RenderTexture(mRenderer, mTexture, nullptr, &rect);
+			SDL_RenderTexture(mRenderer, mTexture, &src_rect, &rect);
+
+			SDL_Delay(100);
+			src_rect.x += 32;
+			if(src_rect.x > 150){
+				src_rect.x=0;
+			}
 
 			// Present all 'drawing' operations that have 
 			// been queued up to this point.

@@ -1,9 +1,9 @@
-// @file: 01.cpp
+// @file: 02.cpp
 // 
 // linux: 			
-// g++ 01.cpp -o prog -lSDL3 && ./prog
+// g++ 02.cpp -o prog -lSDL3 && ./prog
 // cross-platform: 	
-// g++ 01.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
+// g++ 02.cpp -o prog `pkg-config --cflags --libs sdl3` && ./prog
 #include <SDL3/SDL.h>
 
 int main(int argc, char *argv[]){
@@ -13,7 +13,8 @@ int main(int argc, char *argv[]){
 	// Setup one SDL window
 	SDL_Window* window;
 	SDL_Event event;
-	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("Hello C++ North", 320, 240, 
+							  SDL_WINDOW_RESIZABLE);
 
 	// Main application loop
 	while (1) {
