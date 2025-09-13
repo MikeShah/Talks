@@ -7,7 +7,10 @@
 
 int main(int argc, char* argv[]){
 
-  std::array message {"Hello everyone, welcome!"};
+  std::array message {'H','e','l','l','o',' ','e','v','e','r','y' 
+               ,'o','n','e',' ', 'w','e','l','c','o','m','e','!'};
+  // This also works:
+  // std::array<char,24> message = {"Hello everyone welcome!"}; 
   // Class Template Argument Deduction (CTAD),
   // allows us to omit type and size parameters
   // for std::array if it can be inferred.
@@ -16,8 +19,6 @@ int main(int argc, char* argv[]){
     std::print("{}",message[i]); 
   }
   std::println();
-
-
 
 
 
