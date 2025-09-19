@@ -23,6 +23,7 @@ struct SDLApplication{
 		
 		mSurface = SDL_LoadBMP("test.bmp");
 		mTexture = SDL_CreateTextureFromSurface(mRenderer,mSurface);
+		SDL_DestroySurface(mSurface);
 	}
 
 	void Cleanup(){
