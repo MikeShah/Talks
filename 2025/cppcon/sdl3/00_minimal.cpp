@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 
 	// Setup one SDL window
 	SDL_Window* window = nullptr;
-	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("Hello CppCon", 320, 240, SDL_WINDOW_RESIZABLE);
 
 	// Pause program so we can see window for 3 seconds
 	SDL_Delay(3000);

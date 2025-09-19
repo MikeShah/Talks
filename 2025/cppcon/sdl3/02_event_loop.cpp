@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
 	// Setup one SDL window
 	SDL_Window* window;
 	SDL_Event event;
-	window = SDL_CreateWindow("Hello C++ North", 320, 240, 
+	window = SDL_CreateWindow("Hello CppCon", 320, 240, 
 							  SDL_WINDOW_RESIZABLE);
 
 	// Main application loop
@@ -37,3 +37,5 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+
+

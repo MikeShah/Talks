@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
 
 	// Setup one SDL window
 	SDL_Window* window;
-	window = SDL_CreateWindow("Hello C++ North", 320, 240, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("Hello CppCon", 320, 240, SDL_WINDOW_RESIZABLE);
 
 	if (nullptr == window) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, 

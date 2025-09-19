@@ -27,7 +27,7 @@ struct SDLApplication{
 
 	SDLApplication(){
 		// Initialization
-		SDL_CreateWindowAndRenderer("Hello C++ North", 320, 240, 
+		SDL_CreateWindowAndRenderer("Hello CppCon", 320, 240, 
 				SDL_WINDOW_RESIZABLE, &mWindow, &mRenderer);
 		SDL_Log("Renderer: %s",SDL_GetRendererName(mRenderer));
 	}

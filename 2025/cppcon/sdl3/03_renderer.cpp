@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
 
 	// Initialization
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_CreateWindowAndRenderer("Hello C++ North", 320, 240, 
+	SDL_CreateWindowAndRenderer("Hello CppCon", 320, 240, 
 								SDL_WINDOW_RESIZABLE, &window, &renderer);
 	SDL_Log("Renderer: %s",SDL_GetRendererName(renderer));
 
