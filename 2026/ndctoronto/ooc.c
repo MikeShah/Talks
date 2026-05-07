@@ -1,5 +1,5 @@
-// @file: data.c
-// gcc -Wall -Wextra -g data.c -o prog
+// @file: ooc.c
+// gcc -Wall -Wextra -g ooc.c -o prog
 //
 #include <stdio.h>
 

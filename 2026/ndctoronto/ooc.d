@@ -1,49 +1,35 @@
 // @file: ooc.d
 import std.stdio;
-import std.functional;
 
-struct GameEntity{
-  string EntityName;
-  int health;
-  int power;
+struct IntArray{
+  int[50] array; // Always '50' for the sake of this example
 
-  // Member functions / behaviors / actions
-  // C-equivalent function pointer 'void (*action1)(int);'
-  void function(ref GameEntity g, int) action1;
-  // We can get rid of the 'this' pointer, well...we don't get rid of it,
-  // but we hide it in a 'delegate' and then can make our interface cleaner.
-  void delegate(int) doaction1;
-};
+  /// Zero out the array (note: Could also use 'memset')
+  void Zero (){
+    for (int i = 0; i < array.length; i++)
+      array[i] = 0;
+  }
 
-GameEntity GameEntity_Constructor(string name, int h, int p){
-  GameEntity g;
-  g.EntityName = name;
-  g.health = h;
-  g.power  = p;
+  /// Print the array
+  void Print(){
+    for (int i = 0; i < array.length; i++)
+      printf ("array[%d]=%d\n", i, array[i]);
+  }
 
-  // Setup the object 'action1'
-  g.action1 = &Attack;
-  // Make client interface easier by 'binding' first argument.
-  g.doaction1 = &partial!(Attack,g);
-
-  return g;
+  /// Increment range of values in an array
+  void Increment (int start, int end, int increment){
+    for (int i = start; i < end; i++)
+      array[i] += increment;
+  }
 }
 
-void Attack(ref GameEntity g, int boost){
-  writeln(g.EntityName, " attack1!", g.power +boost);
-}
-
-int main(){
-
-  GameEntity g1 = GameEntity_Constructor("Mike",5,10);
-
-  g1.action1(g1,4); // Explicit, but slightly annoying
-  g1.doaction1(5);  // 'more' what we're use to
-
-  GameEntity g2 = GameEntity_Constructor("Michael",6,11);
-  g2.doaction1(10);
-
-  g1.doaction1(5);  // 'more' what we're use to
+int main() {
+  IntArray accounts;
+  accounts.Zero();
+  accounts.Increment(0, 50, 5);
+  accounts.Print();
 
   return 0;
 }
+
+
