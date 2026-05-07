@@ -14,5 +14,12 @@ int main(){
 
   c.writeln;
 
+  // Casting type to a 'ubyte' and accessing field offsets.
+  ubyte* color4 = cast(ubyte*)&c;
+  color4[0].writeln;
+  color4[1].writeln;
+  color4[2].writeln;
+  color4[3].writeln;
+
   return 0;
 }

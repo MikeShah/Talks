@@ -20,22 +20,41 @@ import std.stdio, std.conv;
 
 mixin("int global;");
 
-enum Type{
-  INT, 
-  STRING
-};
 
+/*
 enum header = "enum Type{";
 enum body_  = "INT,STRING";
 enum footer = "};";
-
 
 
 /// Example showing that we can create data at compile-time anywhere.
 static foreach(a ; [1,2,3]){
   mixin("int ddd"~a.to!string~";");
 }
+*/
 
+
+
+/// The purpose of this is to create a 'struct' at run-time.
+/// The idea is to use a 'map' of 'Var' so that you can add any type
+/// as needed.
+struct RunTimeStruct{
+  Var[string] mFields;
+
+  void AddField(Type type, string name){
+    mFields[name] = Var(type,name);
+  }
+
+  string toString(){
+      string result;
+      foreach(k, v ; mFields){
+        result ~= v.mType.to!string~"\t"~k~";\n";
+      }
+      return result;
+  }
+}
+
+enum Type{INT, STRING };
 
 union Data{
   int i;
@@ -67,27 +86,6 @@ struct Var{
     }
   }
 }
-
-/// The purpose of this is to create a 'struct' at run-time.
-/// The idea is to use a 'map' of 'Var' so that you can add any type
-/// as needed.
-struct RunTimeStruct{
-  Var[string] mFields;
-
-  void AddField(Type type, string name){
-    mFields[name] = Var(type,name);
-  }
-
-  string toString(){
-      string result;
-      foreach(k, v ; mFields){
-        result ~= v.mType.to!string~"\t"~k~";\n";
-      }
-      return result;
-  }
-}
-
-
 
 void main(){
   /// Demonstration of creating a 'var type';
