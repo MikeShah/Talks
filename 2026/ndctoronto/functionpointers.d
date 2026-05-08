@@ -33,6 +33,10 @@ struct GameEntity{
     }
   }
 
+  void Attack(void function(int) behavior, int param1){
+    behavior(param1);
+  }
+
 
   // Member functions / behaviors / actions
   // C-equivalent function pointer 'void (*action1)(int);'
@@ -41,6 +45,9 @@ struct GameEntity{
   // but we hide it in a 'delegate' and then can make our interface cleaner.
   void delegate(int) doaction1;
 };
+
+
+
 
 GameEntity GameEntity_Constructor(string name, int h, int p){
   GameEntity g;
@@ -60,12 +67,20 @@ void Attack(ref GameEntity g, int boost){
   writeln(g.EntityName, " attack1!", g.power +boost);
 }
 
+void higher_order_function(int bonus){
+  writeln("Changing the strategy and adding a bonus:",bonus);
+}
+
 int main(){
 
   GameEntity g1 = GameEntity_Constructor("Mike",5,10);
 
   g1.Attack();
   g1.Attack(1);
+  g1.Attack(&higher_order_function,15);
+
+
+
   g1.Attack(2);
   g1.Attack(3);
   g1.action1(g1,4); // Explicit call on object, but slightly annoying

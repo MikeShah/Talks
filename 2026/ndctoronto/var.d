@@ -100,7 +100,8 @@ void main(){
 
   writeln(myVar);
 
-  // Now let's create a struct at 'run-time' that includes the various fields that we need.
+  // Now let's create a struct at 'run-time' 
+  // that includes the various fields that we need.
   RunTimeStruct myStruct;
 
   myStruct.AddField(Type.INT,"intField");
