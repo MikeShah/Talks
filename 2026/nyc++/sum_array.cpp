@@ -30,8 +30,8 @@ int main(){
 
     long* test= new long[ROW*COL];
 
-   //sum_array_cols(test);
-   sum_array_rows(test);
+   sum_array_cols(test);
+   //sum_array_rows(test);
 
     delete[] test;
 
