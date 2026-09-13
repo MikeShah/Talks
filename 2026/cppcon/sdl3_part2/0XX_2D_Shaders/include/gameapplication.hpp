@@ -40,7 +40,7 @@ struct GameState{
 
   GameState(SDL_Renderer* renderer){
     // Load the shader code into a buffer of bytes
-    mGPUShader = LoadShader(renderer,"./my_frag_shader.frag.spv");
+    mGPUShader = LoadShader(renderer,"./pipelines/my_frag_shader.frag.spv");
     SDL_GPURenderStateCreateInfo state_info;
     SDL_zero(state_info); // zero out the 'state_info'
     state_info.fragment_shader = mGPUShader;
