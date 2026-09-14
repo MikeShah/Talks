@@ -11,3 +11,20 @@ int main(int argc, char* argv[]){
   app.MainLoop();
   return 0;
 }
+
+
+/*
+// Reflection()
+void Reflect(){
+// Reflect on the Greet struct type
+constexpr auto type_refl = ^^GameState;
+
+// Print the name of the reflected type
+std::cout << "Type name: " << std::meta::name_of(type_refl) << '\n';
+
+// Iterate and inspect non-static data members
+template for (constexpr auto member : std::meta::non_static_data_members_of(^^Greet)) {
+std::cout << "Member name: " << std::meta::name_of(member) << '\n';
+}
+}
+*/

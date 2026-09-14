@@ -1,5 +1,4 @@
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_stdinc.h>
 #include <string>
 #include <vector>
 #include <cassert>
@@ -22,7 +21,7 @@ GameApplication::GameApplication(const char* title){
   }
   SDL_SetRenderLogicalPresentation(mRenderer, 640, 480,SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-
+  // Create a new Game State
   mGameState = new GameState(mRenderer);
 }
 // Destructor
