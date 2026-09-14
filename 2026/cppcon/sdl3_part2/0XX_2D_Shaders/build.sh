@@ -7,6 +7,7 @@ rm prog
 g++ -g3 -std=c++26 ./src/*.cpp -I./include -o prog `pkg-config --cflags --libs sdl3` 
 
 # Recompile Shaders into spir-v
+# Make sure to install: apt install glslc
 glslc -c ./pipelines/my_frag_shader.frag -o ./pipelines/my_frag_shader.frag.spv
 
 # Run

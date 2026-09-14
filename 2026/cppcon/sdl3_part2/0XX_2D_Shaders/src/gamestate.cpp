@@ -3,6 +3,7 @@
 
 #include "shader.hpp"
 #include "gamestate.hpp"
+#include <algorithm>
 
 struct EnvironmentUniforms {
   float screen_width;
@@ -31,9 +32,9 @@ GameState::GameState(SDL_Renderer* renderer){
 	buildings2->LoadTexture(renderer,"./assets/city/Buildings2.png",0,0,640,480);
 	character->LoadTexture(renderer,"./assets/character.bmp",300,330,32,32);
 
-  mSprites.emplace_back(sky);
   mSprites.emplace_back(buildings1);
   mSprites.emplace_back(buildings2);
+  mSprites.emplace_back(sky);
   mSprites.emplace_back(character); 
 }
 
@@ -57,6 +58,9 @@ void GameState::Render(SDL_Renderer* renderer){
   if (!SDL_SetGPURenderStateFragmentUniforms(mCustomRenderState, 0, &env_data, sizeof(env_data))) {
     SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
   }
+
+  // Sort based on 'order' (e.g. equivalent to a 'z-index')
+  std::ranges::sort(mSprites, [](Sprite* a, Sprite* b) { return a->mOrder < b->mOrder;});
 
   for(int i=0; i < mSprites.size(); i++){
       // Pass in our custom renderer
