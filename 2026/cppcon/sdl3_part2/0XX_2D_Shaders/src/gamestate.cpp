@@ -12,8 +12,6 @@ struct EnvironmentUniforms {
 };
 
 
-
-
 GameState::GameState(SDL_Renderer* renderer){
   // Load the shader code into a buffer of bytes
   mGPUShader = LoadShader(renderer,"./pipelines/my_frag_shader.frag.spv");
@@ -23,29 +21,30 @@ GameState::GameState(SDL_Renderer* renderer){
   mCustomRenderState = SDL_CreateGPURenderState(renderer, &state_info);
 
   // A test surface for us to play with
-  SDL_Surface* surface = SDL_LoadBMP("./assets/character.bmp");
+  Sprite* sky       = new Sprite(0);
+  Sprite* buildings1 = new Sprite(1);
+  Sprite* buildings2 = new Sprite(2);
+  Sprite* character = new Sprite(500);
 
-  mTexture[0] = SDL_CreateTextureFromSurface(renderer, surface);
-  //    SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_BLEND);
+	sky->LoadTexture(renderer,"./assets/city/Sky.png",0,0,640,480);
+	buildings1->LoadTexture(renderer,"./assets/city/Buildings1.png",0,0,640,480);
+	buildings2->LoadTexture(renderer,"./assets/city/Buildings2.png",0,0,640,480);
+	character->LoadTexture(renderer,"./assets/character.bmp",300,330,32,32);
 
-  SDL_DestroySurface(surface);
+  mSprites.emplace_back(sky);
+  mSprites.emplace_back(buildings1);
+  mSprites.emplace_back(buildings2);
+  mSprites.emplace_back(character); 
 }
 
 GameState::~GameState(){
-  for(int i=0; i < 100; i++){
-    SDL_DestroyTexture(mTexture[i]);
-  }
   SDL_DestroyGPURenderState(mCustomRenderState);
   //    SDL_ReleaseGPUShader(device, shader); // TODO
 }
 
-
 void GameState::Render(SDL_Renderer* renderer){
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+  SDL_SetRenderDrawColor(renderer, 0x00, 0x66, 0xDD, 0xFF);
   SDL_RenderClear(renderer);
-  // Draw a texture
-  static SDL_FRect dst_rect{.x = 50, .y = 25, .w = 48, .h = 56 };
-  dst_rect.x += 0.1f;
 
   // STAGE 2: Populate and Modify Data structures
   EnvironmentUniforms env_data = {
@@ -59,17 +58,16 @@ void GameState::Render(SDL_Renderer* renderer){
     SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
   }
 
-  for(int i=0; i < 100; i++){
-    if(mTexture[i] != nullptr){
+  for(int i=0; i < mSprites.size(); i++){
       // Pass in our custom renderer
       SDL_SetGPURenderState(renderer, mCustomRenderState);
-      SDL_RenderTexture(renderer, mTexture[i], nullptr, &dst_rect);
+
+      mSprites[i]->Render(renderer);
       /// Back to the default renderer
       SDL_SetGPURenderState(renderer, nullptr);
       // For debugging purposes render a rectangle where we think our shape should be.
       SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-      SDL_RenderRect(renderer, &dst_rect);
-    }
+      SDL_RenderRect(renderer, &mSprites[i]->mPosition);
   }
 
   // ... more drawing operations

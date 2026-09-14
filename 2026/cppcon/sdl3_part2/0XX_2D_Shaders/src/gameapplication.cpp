@@ -6,7 +6,7 @@
 #include "gameapplication.hpp"
 
 // Constructor
-GameApplication::GameApplication(const char* title){
+GameApplication::GameApplication(const char* title, int argc, char* argv[]){
   SDL_Init(SDL_INIT_VIDEO);
   mWindow = SDL_CreateWindow(title, 640, 480,SDL_WINDOW_RESIZABLE);
   mRenderer = SDL_CreateGPURenderer(nullptr, mWindow);
@@ -21,7 +21,7 @@ GameApplication::GameApplication(const char* title){
   }
   SDL_SetRenderLogicalPresentation(mRenderer, 640, 480,SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-  // Create a new Game State
+  // Create a new Game State once SDL3 is initialized
   mGameState = new GameState(mRenderer);
 }
 // Destructor

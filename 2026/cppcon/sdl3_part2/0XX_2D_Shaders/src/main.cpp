@@ -7,8 +7,19 @@
 
 // Entry Point
 int main(int argc, char* argv[]){
-  GameApplication app("Mike's SDL3 Tutorials");
+
+	// https://wiki.libsdl.org/SDL3/SDL_GetVersion
+	const int compiled = SDL_VERSION;  /* hardcoded number from SDL headers */
+	const int linked = SDL_GetVersion();  /* reported by linked SDL library */
+	SDL_Log("We compiled against SDL version %d.%d.%d ...\n", SDL_VERSIONNUM_MAJOR(compiled), SDL_VERSIONNUM_MINOR(compiled), SDL_VERSIONNUM_MICRO(compiled));
+	SDL_Log("We are linking against SDL version %d.%d.%d.\n", SDL_VERSIONNUM_MAJOR(linked), SDL_VERSIONNUM_MINOR(linked), SDL_VERSIONNUM_MICRO(linked));
+
+  
+  // Simple and somewhat testable way to struture a game.
+  GameApplication app("Mike's SDL3 Tutorials", argc, argv);
   app.MainLoop();
+
+
   return 0;
 }
 

@@ -18,7 +18,7 @@ struct GameApplication{
   bool mFullScreen                        = true;
 
   // Constructor
-  GameApplication(const char* title);
+  GameApplication(const char* title, int argc, char* argv[]);
   // Destructor
   ~GameApplication();
   // Handle input events from I/O or networking devices
