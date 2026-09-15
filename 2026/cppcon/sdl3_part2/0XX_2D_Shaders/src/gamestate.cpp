@@ -49,14 +49,13 @@ void GameState::Render(SDL_Renderer* renderer, SDL_GPURenderState* renderState){
   if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &env_data, sizeof(env_data))) {
     SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
   }
-  // Pass in our custom renderer
-  SDL_SetGPURenderState(renderer, renderState);
 
   // Sort based on 'order' (e.g. equivalent to a 'z-index')
   std::ranges::sort(mSprites, [](Sprite* a, Sprite* b) { return a->mOrder < b->mOrder;});
 
   for(int i=0; i < mSprites.size(); i++){
-
+      // Pass in our custom renderer
+      SDL_SetGPURenderState(renderer, renderState);
       mSprites[i]->Render(renderer);
       /// Back to the default renderer
       SDL_SetGPURenderState(renderer, nullptr);
