@@ -10,6 +10,23 @@
 // Third Party
 #include <SDL3/SDL.h> // For Mac, use <SDL.h>
 
+
+// Helper function to list available render drivers, and
+// print the selected renderer for the given window.
+void PrintWindowRendererInformation(SDL_Window* window){
+  SDL_Log("Available renderer drivers:");
+  for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
+    SDL_Log("%d. %s", i + 1, SDL_GetRenderDriver(i));
+  }
+
+  SDL_Renderer* renderer = SDL_GetRenderer(window);
+
+  SDL_PropertiesID props = SDL_GetRendererProperties(renderer);
+  const char* current_renderer  = (const char*)SDL_GetStringProperty(props, SDL_PROP_RENDERER_NAME_STRING, "could not find renderer");
+
+  SDL_Log("current renderer is: %s\n",current_renderer);
+}
+
 int main(int argc, char* argv[]){
   // Initialize the video subsystem.
   // iF it returns less than 1, then an
@@ -29,7 +46,8 @@ int main(int argc, char* argv[]){
   // The parameters are for the title, x and y position,
   // and the width and height of the window.
   window = SDL_CreateWindow("Mike SDL3 Tutorial - Blending (Press 1-5)", 640,480, 0);
-  SDL_Renderer* renderer = SDL_CreateRenderer(window,nullptr);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window,"opengles2");
+  PrintWindowRendererInformation(window);
 
   SDL_Surface* surface = SDL_LoadBMP("./images/kong.bmp");
   // Set the color key after loading the surface, and before the texture is generated
@@ -85,7 +103,7 @@ int main(int argc, char* argv[]){
         rectangle2.x = event.motion.x;
         rectangle2.y = event.motion.y;
       }
-      
+
     }
     const bool* keystate = SDL_GetKeyboardState(nullptr);
     if(keystate[SDL_SCANCODE_1]){ blendMode = 1; SDL_Log("1 - BLEND");                }
@@ -111,7 +129,6 @@ int main(int argc, char* argv[]){
 
     // Finally show what we've drawn
     SDL_RenderPresent(renderer);
-
   }
 
   SDL_DestroyTexture(texture);
