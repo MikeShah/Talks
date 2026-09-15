@@ -4,17 +4,13 @@
 //       Then build your shader with:
 //       glslc -c my_frag_shader.frag -o my_frag_shader.frag.spv
 #include "gameapplication.hpp"
-
-#include <meta>
+#include "util.hpp"
 
 // Entry Point
 int main(int argc, char* argv[]){
 
-	// https://wiki.libsdl.org/SDL3/SDL_GetVersion
-	const int compiled = SDL_VERSION;  /* hardcoded number from SDL headers */
-	const int linked = SDL_GetVersion();  /* reported by linked SDL library */
-	SDL_Log("We compiled against SDL version %d.%d.%d ...\n", SDL_VERSIONNUM_MAJOR(compiled), SDL_VERSIONNUM_MINOR(compiled), SDL_VERSIONNUM_MICRO(compiled));
-	SDL_Log("We are linking against SDL version %d.%d.%d.\n", SDL_VERSIONNUM_MAJOR(linked), SDL_VERSIONNUM_MINOR(linked), SDL_VERSIONNUM_MICRO(linked));
+  // Some debug information about the version of SDL linked
+  PrintSDLVersionInformation();
 
   // Simple and somewhat testable way to struture a game.
   GameApplication app("Mike's SDL3 Tutorials", argc, argv);
@@ -22,4 +18,5 @@ int main(int argc, char* argv[]){
 
   return 0;
 }
+
 

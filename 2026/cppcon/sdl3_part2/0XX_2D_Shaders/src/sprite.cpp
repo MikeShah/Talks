@@ -1,9 +1,17 @@
 #include "sprite.hpp"
+#include "shader.hpp"
 
 #include <iostream>
 #include <string>
 
-Sprite::Sprite(int order){
+struct EnvironmentUniforms {
+  float screen_width;
+  float screen_height;
+  float time;
+  float padding; // Pad to maintain a 16-byte boundary (4 floats * 4 bytes = 16)
+};
+
+Sprite::Sprite(SDL_Renderer* renderer, int order){
   mOrder = order;
   mPosition.x = 10;
   mPosition.y = 10;
@@ -14,6 +22,8 @@ Sprite::Sprite(int order){
 Sprite::~Sprite(){
   std::cout << "Destroy texture\n";
   SDL_DestroyTexture(mTexture);
+  SDL_DestroyGPURenderState(mCustomRenderState);
+  //    SDL_ReleaseGPUShader(device, shader); // TODO
 }
 
 SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, float x, float y, float w, float h){
@@ -25,6 +35,7 @@ SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, f
   // A test surface for us to play with
   SDL_Surface* surface;
 
+  // Load file based off of extension
   if(filepath[filepath.size() - 3] == 'p'){
     std::cout << filepath[filepath.size() -3] << std::endl;
     surface = SDL_LoadPNG(filepath.c_str());
@@ -46,5 +57,6 @@ SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, f
 }
 
 void Sprite::Render(SDL_Renderer* renderer){
+
   SDL_RenderTexture(renderer, mTexture, nullptr, &mPosition);
 }

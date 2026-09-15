@@ -3,13 +3,19 @@
 
 #include <SDL3/SDL.h>
 #include <string>
+#include <memory>
 
 struct Sprite{
+  // Rendering state
+  SDL_GPURenderState* mCustomRenderState  = nullptr;
+//  std::weak_ptr<SDL_GPURenderState> mCustomRenderState  = nullptr;
+
+  // Sprite Properties
   SDL_Texture* mTexture;
   SDL_FRect    mPosition;
   int          mOrder;
 
-  Sprite(int order);
+  Sprite(SDL_Renderer* renderer, int order);
   ~Sprite();
 
   SDL_Texture* LoadTexture(SDL_Renderer* renderer, std::string filepath, float x, float y, float w, float h);

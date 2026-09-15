@@ -8,9 +8,6 @@
 
 // Holds all of our objects
 struct GameState{
-  // Rendering state
-  SDL_GPURenderState* mCustomRenderState  = nullptr;
-  SDL_GPUShader*      mGPUShader          = nullptr;
 
   // Objects in our scene.
   std::vector<Sprite*> mSprites;
