@@ -10,13 +10,11 @@
 // Third Party
 #include <SDL3/SDL.h> // For Mac, use <SDL.h>
 
-struct EnvironmentUniforms {
-  float screen_width;
-  float screen_height;
-  float time;
-  float padding; // Pad to maintain a 16-byte boundary (4 floats * 4 bytes = 16)
+struct BlendingUniforms {
+  float alpha;
 };
 
+// Data to pass into 'default' fragment shader
 struct Constants{
       float color_scale;
 };
@@ -72,7 +70,7 @@ int main(int argc, char* argv[]){
   // Request a window to be created for our platform
   // The parameters are for the title, x and y position,
   // and the width and height of the window.
-  window = SDL_CreateWindow("Mike SDL3 Tutorial - Blending (Press 1-5)", 640,480, 0);
+  window = SDL_CreateWindow("Mike SDL3 Tutorial - Blending/opacity (Press 1-4)", 640,480, 0);
   //SDL_Renderer* renderer = SDL_CreateRenderer(window,"vulkan");
   SDL_Renderer* renderer = SDL_CreateGPURenderer(nullptr, window);
 
@@ -104,13 +102,13 @@ int main(int argc, char* argv[]){
   rectangle2.w = 200;
   rectangle2.h = 200;
 
-  SDL_GPURenderState* renderState   = CreateRenderState(renderer, "./my_frag_shader.frag.spv");
+  SDL_GPURenderState* renderState   = CreateRenderState(renderer, "./blending.frag.spv");
   SDL_GPURenderState* defaultState  = CreateRenderState(renderer, "./default.frag.spv");
 
   // Infinite loop for our application
   bool gameIsRunning = true;
   // Hold some state for the purpose of blending in this example
-  int  blendMode = 0;   
+  float blendMode = 0.25;   
   // Main application loop
   while(gameIsRunning){
     // (3) Clear and Draw the Screen
@@ -136,28 +134,41 @@ int main(int argc, char* argv[]){
 
     }
     const bool* keystate = SDL_GetKeyboardState(nullptr);
-    if(keystate[SDL_SCANCODE_1]){ blendMode = 1; SDL_Log("1 - BLEND");                }
-    if(keystate[SDL_SCANCODE_2]){ blendMode = 2; SDL_Log("2 - BLEND_PREMULTIPLIED");  }
-    if(keystate[SDL_SCANCODE_3]){ blendMode = 3; SDL_Log("3 - ADD");                  }
-    if(keystate[SDL_SCANCODE_4]){ blendMode = 4; SDL_Log("4 - MOD");                  }
-    if(keystate[SDL_SCANCODE_5]){ blendMode = 5; SDL_Log("5 - MUL");                  }
+    if(keystate[SDL_SCANCODE_1]){ blendMode = 0.25; SDL_Log("0.25");                }
+    if(keystate[SDL_SCANCODE_2]){ blendMode = 0.5; SDL_Log("0.50");  }
+    if(keystate[SDL_SCANCODE_3]){ blendMode = 0.75; SDL_Log("0.75");                  }
+    if(keystate[SDL_SCANCODE_4]){ blendMode = 1.0; SDL_Log("1.0");                  }
 
     // Pass in our custom renderer
+    // Pass data to binding uniform Slot 0
+    BlendingUniforms blending_data  = {
+      .alpha = blendMode,
+    };
+    if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &blending_data, sizeof(blending_data))) {
+      SDL_Log("Failed to push data to Fragment Uniform Slot ?: %s", SDL_GetError());
+    }
     SDL_SetGPURenderState(renderer, renderState);
     SDL_RenderTexture(renderer,texture,NULL,&rectangle2);
 
     static float scale = 0.0f;
-    // STAGE 2: Populate and Modify Data structures
+    static bool   grow = true;
     Constants constants_data  = {
       .color_scale = scale,
     };
 
-    scale+= 0.001;
-    if (scale > 5.0f){
-      scale=0.0f;
+    if(grow){    
+      scale+= 0.001;
+    }else{
+      scale-= 0.001;
+    }
+    if (scale > 2.0f){
+      grow = false;
+    }
+    if(scale < 0.001){
+      grow = true;
     }
     // STAGE 3: Inject parameters using SDL_SetGPURenderStateFragmentUniforms
-    // Pass Environment data to binding uniform Slot 0
+    // Pass data to binding uniform Slot 0
     if (!SDL_SetGPURenderStateFragmentUniforms(defaultState, 0, &constants_data, sizeof(constants_data))) {
       SDL_Log("Failed to push data to Fragment Uniform Slot ?: %s", SDL_GetError());
     }
