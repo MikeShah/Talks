@@ -90,7 +90,7 @@ void GameApplication::Update(){
 
 void GameApplication::Render(){
   if(mGameState != nullptr){
-    mGameState->Render(mRenderer);
+    mGameState->Render(mRenderer, mResourceManager->GetPipeline("sine"));
   }
 }
 

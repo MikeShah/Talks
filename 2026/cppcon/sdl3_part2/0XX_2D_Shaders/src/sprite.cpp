@@ -4,12 +4,6 @@
 #include <iostream>
 #include <string>
 
-struct EnvironmentUniforms {
-  float screen_width;
-  float screen_height;
-  float time;
-  float padding; // Pad to maintain a 16-byte boundary (4 floats * 4 bytes = 16)
-};
 
 Sprite::Sprite(SDL_Renderer* renderer, int order){
   mOrder = order;
@@ -57,6 +51,5 @@ SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, f
 }
 
 void Sprite::Render(SDL_Renderer* renderer){
-
   SDL_RenderTexture(renderer, mTexture, nullptr, &mPosition);
 }

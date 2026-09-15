@@ -5,6 +5,12 @@
 #include <algorithm>
 
 
+struct EnvironmentUniforms {
+  float screen_width;
+  float screen_height;
+  float time;
+  float padding; // Pad to maintain a 16-byte boundary (4 floats * 4 bytes = 16)
+};
 
 GameState::GameState(SDL_Renderer* renderer){
 
@@ -34,17 +40,17 @@ void GameState::Render(SDL_Renderer* renderer, SDL_GPURenderState* renderState){
 
   // STAGE 2: Populate and Modify Data structures
   EnvironmentUniforms env_data = {
-    .screen_width = 640.0f,
-    .screen_height = 480.0f,
-    .time = (float)SDL_GetTicks() / 1000.0f
-  };
+                .screen_width = 640.0f,
+                .screen_height = 480.0f,
+                .time = (float)SDL_GetTicks() / 1000.0f
+              };
   // STAGE 3: Inject parameters using SDL_SetGPURenderStateFragmentUniforms
   // Pass Environment data to binding uniform Slot 0
   if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &env_data, sizeof(env_data))) {
     SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
   }
   // Pass in our custom renderer
-  SDL_SetGPURenderState(renderer, mCustomRenderState);
+  SDL_SetGPURenderState(renderer, renderState);
 
   // Sort based on 'order' (e.g. equivalent to a 'z-index')
   std::ranges::sort(mSprites, [](Sprite* a, Sprite* b) { return a->mOrder < b->mOrder;});

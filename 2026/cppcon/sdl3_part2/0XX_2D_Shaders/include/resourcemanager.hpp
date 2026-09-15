@@ -17,7 +17,6 @@ struct ResourceManager{
   // filepath - where the fragment shader code lives
   void AddPipeline(SDL_Renderer* renderer, std::string name, std::string filepath ){
     // Load the shader code into a buffer of bytes
-    //mGPUShader = LoadShader(renderer,"./pipelines/my_frag_shader.frag.spv");
     if(!mRenderStatePipelines.contains(name)){
       SDL_GPUShader* gpuShader = LoadShader(renderer,filepath.c_str());
       SDL_GPURenderStateCreateInfo state_info;

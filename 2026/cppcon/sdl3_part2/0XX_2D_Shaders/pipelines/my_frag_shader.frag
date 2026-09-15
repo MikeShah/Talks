@@ -24,11 +24,11 @@ void main() {
     float wave = sin((v_texCoord.x * 10.0) + (env.time * 5.0));
     
     // Mix the shape's original draw color with our uniform tint and dynamic wave factor
-//    vec4 final_color = v_color;
-//    final_color.rgb += vec3(wave * 0.2);
-//    out_color =  final_color;
+    vec4 final_color = v_color;
+    final_color.rgb += vec3(wave * 0.2);
+    out_color =  final_color;
 
     // The original shader
     vec4 texture_color = texture(base_sprite, v_texCoord);
-    out_color = texture_color;
+    out_color = mix(texture_color,final_color,0.5);
 }

@@ -16,7 +16,7 @@ struct GameState{
 
   ~GameState();
 
-  void Render(SDL_Renderer* renderer);
+  void Render(SDL_Renderer* renderer, SDL_GPURenderState* renderState);
 };
 
 #endif
