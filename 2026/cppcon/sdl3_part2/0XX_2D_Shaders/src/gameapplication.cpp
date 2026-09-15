@@ -23,6 +23,11 @@ GameApplication::GameApplication(const char* title, int argc, char* argv[]){
 
   // Create a new Game State once SDL3 is initialized
   mGameState = new GameState(mRenderer);
+  // Create a new resource manager
+  mResourceManager = new ResourceManager();
+  // Add some render states
+
+  mResourceManager->AddPipeline(mRenderer,"sine","./pipelines/my_frag_shader.frag.spv");
 }
 // Destructor
 GameApplication::~GameApplication(){
@@ -97,7 +102,10 @@ void GameApplication::MainLoop(){
   // Our infinite loop
   while(mRunning){
     Uint64 currentTick = SDL_GetTicks();
+
+    // Input / Update / Render
     Tick();
+
     SDL_Delay(16);
     fps++;
     // Per frame calculation of elapsed time
