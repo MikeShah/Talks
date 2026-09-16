@@ -37,6 +37,7 @@ struct ResourceManager{
     }
   }
 
+  // Hold key/value pairs of render states
   using StringPipelineMap = std::unordered_map<std::string, SDL_GPURenderState*>;
   StringPipelineMap mRenderStatePipelines;
 };

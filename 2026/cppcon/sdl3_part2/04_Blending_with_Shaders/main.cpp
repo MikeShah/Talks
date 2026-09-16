@@ -139,18 +139,8 @@ int main(int argc, char* argv[]){
     if(keystate[SDL_SCANCODE_3]){ blendMode = 0.75; SDL_Log("0.75");                  }
     if(keystate[SDL_SCANCODE_4]){ blendMode = 1.0; SDL_Log("1.0");                  }
 
-    // Pass in our custom renderer
-    // Pass data to binding uniform Slot 0
-    BlendingUniforms blending_data  = {
-      .alpha = blendMode,
-    };
-    if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &blending_data, sizeof(blending_data))) {
-      SDL_Log("Failed to push data to Fragment Uniform Slot ?: %s", SDL_GetError());
-    }
-    SDL_SetGPURenderState(renderer, renderState);
-    SDL_RenderTexture(renderer,texture,NULL,&rectangle2);
 
-    static float scale = 0.0f;
+    static float scale = 1.0f;
     static bool   grow = true;
     Constants constants_data  = {
       .color_scale = scale,
@@ -167,15 +157,25 @@ int main(int argc, char* argv[]){
     if(scale < 0.001){
       grow = true;
     }
-    // STAGE 3: Inject parameters using SDL_SetGPURenderStateFragmentUniforms
     // Pass data to binding uniform Slot 0
     if (!SDL_SetGPURenderStateFragmentUniforms(defaultState, 0, &constants_data, sizeof(constants_data))) {
       SDL_Log("Failed to push data to Fragment Uniform Slot ?: %s", SDL_GetError());
     }
-    /// Back to the default renderer
+    /// Back to the default renderer that we 'copied' but sending in our custom data
     SDL_SetGPURenderState(renderer, defaultState);
 //    SDL_SetGPURenderState(renderer, nullptr);
     SDL_RenderTexture(renderer,texture,NULL,&rectangle);
+
+    // Pass in our custom renderer
+    // Pass data to binding uniform Slot 0
+    BlendingUniforms blending_data  = {
+      .alpha = blendMode,
+    };
+    if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &blending_data, sizeof(blending_data))) {
+      SDL_Log("Failed to push data to Fragment Uniform Slot ?: %s", SDL_GetError());
+    }
+    SDL_SetGPURenderState(renderer, renderState);
+    SDL_RenderTexture(renderer,texture,NULL,&rectangle2);
 
     // Finally show what we've drawn
     SDL_RenderPresent(renderer);
