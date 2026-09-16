@@ -5,9 +5,9 @@
 #include <string>
 
 
-Sprite::Sprite(SDL_Renderer* renderer, int order){
+Sprite::Sprite(SDL_Renderer* renderer, int order, std::string pipelineName){
   mOrder = order;
-  mRenderStateName = "unknown";
+  mRenderStateName = pipelineName;
   mPosition.x = 10;
   mPosition.y = 10;
   mPosition.w = 10;
@@ -38,6 +38,16 @@ SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, f
     std::cout << filepath[filepath.size() -3] << std::endl;
     surface = SDL_LoadBMP(filepath.c_str());
   }
+
+  // Note: If we don't setup the surface, then it's likely
+  //       that we won't have RGBA data and thus transparency
+  //       won't really do anything when we render the texture.
+  //       So it's important that we enable 'colorkey' here.
+  const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(surface->format);
+  SDL_Palette* palette = SDL_GetSurfacePalette(surface);
+  Uint32 colorKey = SDL_MapRGB(details, palette, 0xFF, 0x00, 0xFF);
+  SDL_SetSurfaceColorKey(surface, true, colorKey);
+
 
   result = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_DestroySurface(surface);

@@ -11,11 +11,17 @@ layout(set = 2, binding = 0) uniform sampler2D base_sprite;
 // Output color to the screen target
 layout(location = 0) out vec4 out_color;
 
-// SLOT 0: Matches C struct 'EnvironmentUniforms' 
-// Driven by: SDL_SetGPURenderStateFragmentUniforms(custom_state, 0, &env_data, ...)
-layout(set = 3, binding = 0, std140) uniform BlendingUniforms{
+// SLOT 0: Matches C struct 'GameStateUniforms' 
+layout(set = 3, binding = 0, std140) uniform GameStateUniforms {
+    float screen_width;
+    float screen_height;
+    float mouseX;
+    float mouseY;
+    float time;
+    float color_scale;
     float alpha;
-} blending;
+    float padding;
+} gs;
 
 void main() {
 
@@ -25,6 +31,6 @@ void main() {
     if(texture_color.r == 1.0 && texture_color.b == 1.0){
       out_color = vec4(0.0,0.0,0.0,0.0);
     }else{
-      out_color = vec4(texture_color.rgb,blending.alpha);
+      out_color = vec4(texture_color.rgb,gs.alpha);
     }
 }

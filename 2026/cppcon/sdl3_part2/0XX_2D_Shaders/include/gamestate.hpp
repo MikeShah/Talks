@@ -6,6 +6,17 @@
 #include "resourcemanager.hpp"
 #include "sprite.hpp"
 
+// One big struture to send every frame
+struct GameStateUniforms{
+  float screen_width;
+  float screen_height;
+  float mouseX;
+  float mouseY;
+  float time;
+  float color_scale; 
+  float alpha;
+  float padding;
+};
 
 // Holds all of our objects
 struct GameState{
@@ -23,6 +34,9 @@ struct GameState{
   //           We might want to render from a specific 'camera' 
   //           or provide a filtering function here.
   void Render(SDL_Renderer* renderer);
+
+  // Data passed in here once per-frame that is shared across all shaders.
+  GameStateUniforms mGameStateUniforms;
 };
 
 #endif

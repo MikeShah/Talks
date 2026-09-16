@@ -2,9 +2,7 @@
 #define GAMEAPPLICATION_HPP
 #include <SDL3/SDL.h>
 
-#include "shader.hpp"
 #include "gamestate.hpp"
-
 
 struct GameApplication{
   SDL_Window*         mWindow;
