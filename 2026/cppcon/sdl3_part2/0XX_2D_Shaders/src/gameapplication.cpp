@@ -23,11 +23,6 @@ GameApplication::GameApplication(const char* title, int argc, char* argv[]){
 
   // Create a new Game State once SDL3 is initialized
   mGameState = new GameState(mRenderer);
-  // Create a new resource manager
-  mResourceManager = new ResourceManager();
-  // Add some render states
-
-  mResourceManager->AddPipeline(mRenderer,"sine","./pipelines/my_frag_shader.frag.spv");
 }
 // Destructor
 GameApplication::~GameApplication(){
@@ -90,7 +85,7 @@ void GameApplication::Update(){
 
 void GameApplication::Render(){
   if(mGameState != nullptr){
-    mGameState->Render(mRenderer, mResourceManager->GetPipeline("sine"));
+    mGameState->Render(mRenderer);
   }
 }
 

@@ -12,7 +12,10 @@ struct EnvironmentUniforms {
   float padding; // Pad to maintain a 16-byte boundary (4 floats * 4 bytes = 16)
 };
 
+
 GameState::GameState(SDL_Renderer* renderer){
+  // TODO:
+  // Homework activity to make this 'data-driven'
 
   // A test surface for us to play with
   Sprite* sky       = new Sprite(renderer,0);
@@ -20,48 +23,58 @@ GameState::GameState(SDL_Renderer* renderer){
   Sprite* buildings2 = new Sprite(renderer,2);
   Sprite* character = new Sprite(renderer,500);
 
-	sky->LoadTexture(renderer,"./assets/city/Sky.png",0,0,640,480);
-	buildings1->LoadTexture(renderer,"./assets/city/Buildings1.png",0,0,640,480);
-	buildings2->LoadTexture(renderer,"./assets/city/Buildings2.png",0,0,640,480);
-	character->LoadTexture(renderer,"./assets/character.bmp",300,330,32,32);
+  sky->LoadTexture(renderer,"./assets/city/Sky.png",0,0,640,480);
+  buildings1->LoadTexture(renderer,"./assets/city/Buildings1.png",0,0,640,480);
+  buildings2->LoadTexture(renderer,"./assets/city/Buildings2.png",0,0,640,480);
+  character->LoadTexture(renderer,"./assets/character.bmp",300,330,32,32);
 
   mSprites.emplace_back(buildings1);
   mSprites.emplace_back(buildings2);
   mSprites.emplace_back(sky);
   mSprites.emplace_back(character); 
+
+  // Create a new resource manager
+  mResourceManager = new ResourceManager();
+  // Add some render states
+  mResourceManager->AddPipeline(renderer,"sine","./pipelines/sine.frag.spv");
+  mResourceManager->AddPipeline(renderer,"blend","./pipelines/blend.frag.spv");
 }
 
 GameState::~GameState(){
 }
 
-void GameState::Render(SDL_Renderer* renderer, SDL_GPURenderState* renderState){
+void GameState::Render(SDL_Renderer* renderer){
   SDL_SetRenderDrawColor(renderer, 0x00, 0x66, 0xDD, 0xFF);
   SDL_RenderClear(renderer);
-
-  // STAGE 2: Populate and Modify Data structures
-  EnvironmentUniforms env_data = {
-                .screen_width = 640.0f,
-                .screen_height = 480.0f,
-                .time = (float)SDL_GetTicks() / 1000.0f
-              };
-  // STAGE 3: Inject parameters using SDL_SetGPURenderStateFragmentUniforms
-  // Pass Environment data to binding uniform Slot 0
-  if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &env_data, sizeof(env_data))) {
-    SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
-  }
 
   // Sort based on 'order' (e.g. equivalent to a 'z-index')
   std::ranges::sort(mSprites, [](Sprite* a, Sprite* b) { return a->mOrder < b->mOrder;});
 
   for(int i=0; i < mSprites.size(); i++){
-      // Pass in our custom renderer
-      SDL_SetGPURenderState(renderer, renderState);
-      mSprites[i]->Render(renderer);
-      /// Back to the default renderer
-      SDL_SetGPURenderState(renderer, nullptr);
-      // For debugging purposes render a rectangle where we think our shape should be.
-      SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-      SDL_RenderRect(renderer, &mSprites[i]->mPosition);
+    // Render each sprite
+    mSprites[i]->SetRenderState("sine");
+    SDL_GPURenderState* renderState = mResourceManager->GetPipeline(mSprites[i]->mRenderStateName);
+    SDL_SetGPURenderState(renderer, renderState);
+
+    // STAGE 2: Populate and Modify Data structures
+    EnvironmentUniforms env_data = {
+      .screen_width = 640.0f,
+      .screen_height = 480.0f,
+      .time = (float)SDL_GetTicks() / 1000.0f
+    };
+    // STAGE 3: Inject parameters using SDL_SetGPURenderStateFragmentUniforms
+    // Pass Environment data to binding uniform Slot 0
+    if (!SDL_SetGPURenderStateFragmentUniforms(renderState, 0, &env_data, sizeof(env_data))) {
+      SDL_Log("Failed to push data to Fragment Uniform Slot 0: %s", SDL_GetError());
+    }
+
+    mSprites[i]->Render(renderer);
+
+    /// Back to the default renderer for the bounding boxes
+    SDL_SetGPURenderState(renderer, nullptr);
+    // For debugging purposes render a rectangle where we think our shape should be.
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+    SDL_RenderRect(renderer, &mSprites[i]->mPosition);
   }
 
   // ... more drawing operations

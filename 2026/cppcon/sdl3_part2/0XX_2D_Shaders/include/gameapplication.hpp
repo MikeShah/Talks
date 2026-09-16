@@ -4,7 +4,6 @@
 
 #include "shader.hpp"
 #include "gamestate.hpp"
-#include "resourcemanager.hpp"
 
 
 struct GameApplication{
@@ -13,9 +12,6 @@ struct GameApplication{
 
   // Hold onto the gamestate
   GameState*          mGameState;
-
-  // Hold onto my Resource Manager
-  ResourceManager*    mResourceManager;
 
   // For my application to run indefinitely
   bool mRunning                           = true;

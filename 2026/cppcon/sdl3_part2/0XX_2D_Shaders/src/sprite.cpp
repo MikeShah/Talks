@@ -7,6 +7,7 @@
 
 Sprite::Sprite(SDL_Renderer* renderer, int order){
   mOrder = order;
+  mRenderStateName = "unknown";
   mPosition.x = 10;
   mPosition.y = 10;
   mPosition.w = 10;
@@ -53,3 +54,8 @@ SDL_Texture* Sprite::LoadTexture(SDL_Renderer* renderer, std::string filepath, f
 void Sprite::Render(SDL_Renderer* renderer){
   SDL_RenderTexture(renderer, mTexture, nullptr, &mPosition);
 }
+
+void Sprite::SetRenderState(std::string pipelineName){
+  mRenderStateName = pipelineName;
+}
+

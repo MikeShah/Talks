@@ -14,6 +14,8 @@ struct Sprite{
   SDL_Texture* mTexture;
   SDL_FRect    mPosition;
   int          mOrder;
+  // How will we render the sprite?
+  std::string mRenderStateName;
 
   Sprite(SDL_Renderer* renderer, int order);
   ~Sprite();
@@ -21,6 +23,10 @@ struct Sprite{
   SDL_Texture* LoadTexture(SDL_Renderer* renderer, std::string filepath, float x, float y, float w, float h);
 
   void Render(SDL_Renderer* renderer);
+
+  // Sets the name of the pipeline to lookup prior
+  // to rendering.
+  void SetRenderState(std::string pipeline);
 };
 
 #endif
